@@ -13,6 +13,6 @@ python src/main_image.py \
  --config_json 'config/config_image.json' \
  --images_path '' \
  --csvs_path '' \
- --results_dir 'results' \
+ --results_path 'results' \
  --verbose
 echo "TBD"
