@@ -295,14 +295,7 @@ def get_catalogues_ids_from_csv(catalogue_csv, type):
 class QNS_structure:
 
     # Method: __init__
-    def __init__(
-            self, 
-            query_vector=None, 
-            neighbor_vectors=[], 
-            scores=None, 
-            cmpfunc=euclidean, 
-            query_vector_id=-1, 
-            neighbor_vectors_ids=[]):    
+    def __init__(self, query_vector=None, neighbor_vectors=[], scores=None, cmpfunc=euclidean, query_vector_id=-1, neighbor_vectors_ids=[]):    
         
         self.set_query_vector(query_vector, query_vector_id)
         self.set_neighbor_vectors(neighbor_vectors, neighbor_vectors_ids)
@@ -387,7 +380,7 @@ class QNS_structure:
     # Method: Show summary
     def show_summary(self, num_flag=False, str=True):
         if num_flag:
-            init_dist = self.calculate_initial_distance ()
+            init_dist = self.calculate_initial_distance()
             init_score = self.calculate_initial_score ()
         
         self.show_query_vector()
@@ -409,15 +402,21 @@ class QNS_structure:
         print("Neighbor PID: ", self.neighbor_vectors_id)
         print("Expert  Sort: ", self.calculate_expert_sort())
         print("----------------------------------")
-        
-    def calculate_initial_distance (self):
+
+        return
+
+
+    # Method: Calculate initial distance between neighbours
+    def calculate_initial_distance(self):
         initial_distance = [self.dist_func(self.query_vector, neighbor) for neighbor in self.neighbor_vectors]
         if self.dist_func is not euclidean:
             initial_distance = 1.0 - initial_distance
 
         return initial_distance  
 
-    def calculate_initial_score (self):
+
+    # Method: Calculate initial score
+    def calculate_initial_score(self):
         sorted_indices = np.argsort(np.array(self.calculate_initial_distance())) # Use argsort to get the indices that would sort the array
         initial_score  = np.zeros_like(sorted_indices)
     
@@ -426,20 +425,30 @@ class QNS_structure:
 
         return initial_score
 
+
+    # Method: Calculate initial sort of the distances
     def calculate_initial_sort(self):
         initial_sort  = np.argsort(self.calculate_initial_distance())
         return initial_sort
 
+
+    # Method: Calculate expert sort
     def calculate_expert_sort(self):
         if self.score_vector is not None:
             expert_sort  = np.argsort(self.score_vector)
         return expert_sort
 
+
+    # Method: Add neighbour vector
     def add_neighbor_vector(self, neighbor_vector, neighbor_vector_id=-1):
         self.neighbor_vectors.append(neighbor_vector)
         self.neighbor_vectors_id.append(neighbor_vector_id)
         self.neighbor_count = self.neighbor_count + 1
-    
+
+        return
+
+
+    # Method: Delete neighbour vector
     def delete_neighbor_vector(self, pid):
         for i in range(self.neighbor_count):
             if pid == self.neighbor_vectors_id[i]:
@@ -449,54 +458,84 @@ class QNS_structure:
                 self.neighbor_count = self.neighbor_count - 1
                 print('Deletion...')
                 break
+        
+        return
 
-    # Utility function to convert query_vector to torch tensor
+
+    # Method: Utility function to convert query_vector to torch tensor
     def convert_query_to_torch(self):
         if self.query_vector is not None:
             self.query_vector = torch.tensor(self.query_vector, dtype=torch.float64, requires_grad=False)
+        
+        return
 
-    # Utility function to convert score_vector to torch tensor
+
+    # Method: Utility function to convert score_vector to torch tensor
     def convert_score_to_torch(self):
         if self.score_vector is not None:
             self.score_vector = torch.tensor(self.score_vector, dtype=torch.float64, requires_grad=False)
+        
+        return
 
-    # Utility function to convert neighbor_vectors to torch tensors
+
+    # Method: Utility function to convert neighbor_vectors to torch tensors
     def convert_neighbors_to_torch(self):
-        self.neighbor_vectors = [torch.tensor(neighbor, dtype=torch.float64, requires_grad=False) 
-                                for neighbor in self.neighbor_vectors]
+        
+        self.neighbor_vectors = [
+            torch.tensor(neighbor, dtype=torch.float64, requires_grad=False) for neighbor in self.neighbor_vectors
+        ]
 
-    # Utility function to convert query_vector back to numpy array
+        return
+
+
+    # Method: Utility function to convert query_vector back to NumPy array
     def convert_query_to_numpy(self):
+        
         if isinstance(self.query_vector, torch.Tensor):
             self.query_vector = self.query_vector.numpy()
+        
+        return
 
-    # Utility function to convert score_vector back to numpy array
+
+    # Method: Utility function to convert score_vector back to NumPy array
     def convert_score_to_numpy(self):
+
         if isinstance(self.score_vector, torch.Tensor):
             self.score_vector = self.score_vector.numpy()
+        
+        return
 
-    # Utility function to convert neighbor_vectors back to numpy arrays
+
+    # Method: Utility function to convert neighbor_vectors back to numpy arrays
     def convert_neighbors_to_numpy(self):
+
         if all(isinstance(neighbor, torch.Tensor) for neighbor in self.neighbor_vectors):
             self.neighbor_vectors = [neighbor.numpy() for neighbor in self.neighbor_vectors]
 
+        return
+
+
+
+# Function: Get query neighbour elements
 def get_query_neighbor_elements(catalogue_info_csv, catalogue_user_info_csv, patient_info_csv, catalogue_type='E', doctor_code=-1):
 
+    # Check if we want all catalogues or just a few
     if doctor_code == -1:
         queries_id, neighbours_id = get_catalogues_ids_from_csv(catalogue_info_csv, catalogue_type)
     else:
         queries_id, neighbours_id = get_catalogues_ids_per_doctor(catalogue_info_csv, catalogue_user_info_csv, catalogue_type, doctor_code)
     
-    # Remove repatative indexes
+    # Remove repetitive indexes
     for idx, q in enumerate(queries_id):
         for jdx, n in enumerate(neighbours_id[idx]):
             if q == n:
-                neighbours_id[idx] = np.delete(neighbours_id[idx], jdx) #neighbours_id[idx].remove(n)
+                neighbours_id[idx] = np.delete(neighbours_id[idx], jdx) # neighbours_id[idx].remove(n)
 
+    # Build QNS list
     QNS_list = []
     for idx in range(len(queries_id)): 
         qns_element = QNS_structure()
-        #itm = get_tabular_features_filtered(patient_info_csv, queries_id[idx]) 
+        # itm = get_tabular_features_filtered(patient_info_csv, queries_id[idx]) 
         itm = get_tabular_features_filtered_numpy(patient_info_csv, queries_id[idx]) 
         if itm is None:
             continue
@@ -513,24 +552,27 @@ def get_query_neighbor_elements(catalogue_info_csv, catalogue_user_info_csv, pat
         
     return QNS_list, len(QNS_list)
 
+
+
+# Function: Get the path(s) of the query neighbour elements
 def get_query_neighbor_elements_path(catalogue_info_csv, catalogue_user_info_csv, patient_info_csv, favorite_image_info_csv, patient_images_info_csv, catalogue_type='E', doctor_code=-1):
 
-    # Selecting Samples Based on DOCTOR Preference
+    # Selecting Samples Based on doctor/clinician preference
     if doctor_code == -1:
         queries_id, neighbours_id = get_catalogues_ids_from_csv(catalogue_info_csv, catalogue_type)
     else:
         queries_id, neighbours_id = get_catalogues_ids_per_doctor(catalogue_info_csv, catalogue_user_info_csv, catalogue_type, doctor_code)
     
-    # Remove repatative indexes
+    # Remove repetitive indexes
     for idx, q in enumerate(queries_id):
         for jdx, n in enumerate(neighbours_id[idx]):
             if q == n:
-                neighbours_id[idx] = np.delete(neighbours_id[idx], jdx) #neighbours_id[idx].remove(n)
+                neighbours_id[idx] = np.delete(neighbours_id[idx], jdx) # neighbours_id[idx].remove(n)
 
     QNS_list = []
-    for idx in range(len(queries_id)): 
+    for idx in range(len(queries_id)):
         qns_element = QNS_structure()
-        itm = get_pre_image_from_id(patient_info_csv, favorite_image_info_csv, patient_images_info_csv,queries_id[idx])
+        itm = get_pre_image_from_id(patient_info_csv, favorite_image_info_csv, patient_images_info_csv, queries_id[idx])
 
         if itm is None:
             continue
@@ -546,13 +588,19 @@ def get_query_neighbor_elements_path(catalogue_info_csv, catalogue_user_info_csv
         
     return QNS_list, len(QNS_list)
 
-# Edit Resized Sample Names For the Algorithm
+
+
+# Function: Create a new name for the resized samples
 def edit_name_incase_using_resized(path, filename):
     basename = os.path.basename(filename)
     resized_filename = os.path.splitext(basename)[0] + '_resized.jpg'
     image_path = os.path.join(path, resized_filename)
+    
     return image_path
 
+
+
+# Function: Collaborative tabular normalize
 def collaborative_tabular_normalize(qns_list, min_max_values=None):
     if min_max_values is not None:
         vec_len = len(min_max_values)
@@ -592,6 +640,9 @@ def collaborative_tabular_normalize(qns_list, min_max_values=None):
 
     return min_max_values
 
+
+
+# Function: Sample manager
 def sample_manager(samples_path, pickle_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, default=True):
 
     if default:
@@ -661,8 +712,11 @@ def sample_manager(samples_path, pickle_path, catalogue_info, catalogue_user_inf
 
     return QNS_image_list_train, QNS_image_list_test, QNS_tabular_list_train, QNS_tabular_list_test
 
-# Resize Images and Save In a Directory Before Training to Speed Up Training
+
+
+# Function: Resize Images and Save In a Directory Before Training to Speed Up Training
 def resize_images(input_dir, output_dir, size=(224, 224)):
+    
     # Create the output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
