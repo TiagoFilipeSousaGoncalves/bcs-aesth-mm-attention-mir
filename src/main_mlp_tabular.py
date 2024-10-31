@@ -6,8 +6,8 @@ from torch.utils.data import DataLoader
 from torch.nn import TripletMarginLoss
 
 from TabularUtilities import TabularMLP
-from TrainUtilities import TripletDataset, train_triplets, save_model, evaluate_nddg
 from utilities_preproc import sample_manager
+from utilities_traintest import TripletDataset, train_triplets, save_model, evaluate_nddg
 
 #Required Paths
 current_directory = os.getcwd()

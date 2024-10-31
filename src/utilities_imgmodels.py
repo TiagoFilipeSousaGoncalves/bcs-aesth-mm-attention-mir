@@ -385,3 +385,21 @@ class Beit_Base_Patch16_224_MLP(nn.Module):
         x = self.fc2(x)
         featureVec = self.relu2(x)
         return featureVec
+
+
+
+# Dictionary: Models dictionary
+MODELS_DICT = {
+    "Google_Base_Patch16_224": Google_Base_Patch16_224(),
+    "DeiT_Base_Patch16_224": DeiT_Base_Patch16_224(),
+    "Beit_Base_Patch16_224": Beit_Base_Patch16_224(),
+    "DinoV2_Base_Patch16_224": DinoV2_Base_Patch16_224(),
+    "ResNet50_Base_224": ResNet50_Base_224(),
+    "VGG16_Base_224": VGG16_Base_224(),
+    "Google_Base_Patch16_224_MLP": Google_Base_Patch16_224_MLP(),
+    "DinoV2_Base_Patch16_224_MLP": DinoV2_Base_Patch16_224_MLP(),
+    "Beit_Base_Patch16_224_MLP": Beit_Base_Patch16_224_MLP(),
+    "DeiT_Base_Patch16_224_MLP": DeiT_Base_Patch16_224_MLP(),
+    "ResNet50_Base_224_MLP": ResNet50_Base_224_MLP(),
+    "VGG16_Base_224_MLP": VGG16_Base_224_MLP()
+}

@@ -3,7 +3,7 @@ from torch.nn import functional as F
 import torch.nn as nn
 from torch.nn import BatchNorm1d
 import numpy
-from TrainUtilities import test_ndcg 
+from utilities_train import test_ndcg 
 import copy
 from scipy.spatial.distance import euclidean
 
