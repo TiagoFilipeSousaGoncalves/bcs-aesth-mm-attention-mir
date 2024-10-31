@@ -79,7 +79,7 @@ if __name__ == "__main__":
     patient_images_info = os.path.join(csvs_path, 'patient_images.csv')
     catalogue_info = os.path.join(csvs_path, 'catalogue_info.csv')
     catalogue_user_info = os.path.join(csvs_path, 'catalogue_user_info.csv')
-    experiment_results_path = os.path(results_path, timestamp)
+    experiment_results_path = os.path.join(results_path, timestamp)
     pickle_path = os.path.join(experiment_results_path, 'data', 'pickles')
     path_save = os.path.join(experiment_results_path, 'bin')
 
