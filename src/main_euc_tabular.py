@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import os
-from PreprocessingUtilities import sample_manager
+from utilities_preproc import sample_manager
 from TabularUtilities import euclidian_optimizer, euclidian_evaluate
 import sys
 

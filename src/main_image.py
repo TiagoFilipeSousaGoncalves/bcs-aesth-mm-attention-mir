@@ -9,7 +9,7 @@ from ImageUtilities import Google_Base_Patch16_224, DeiT_Base_Patch16_224, Beit_
 from ImageUtilities import Google_Base_Patch16_224_MLP, DeiT_Base_Patch16_224_MLP, Beit_Base_Patch16_224_MLP, DinoV2_Base_Patch16_224_MLP, ResNet50_Base_224_MLP, VGG16_Base_224_MLP
 
 from TrainUtilities import TripletDataset, train_triplets, save_model
-from PreprocessingUtilities import sample_manager
+from utilities_preproc import sample_manager
 
 #Required Paths
 current_directory = os.getcwd()
