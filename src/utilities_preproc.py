@@ -234,11 +234,11 @@ def get_pre_image_from_id(patient_info, favorite_images, patient_images, id):
     
     # If these are strings, then they should be CSV filepaths
     if isinstance(patient_info, str):
-        patient_info = pd.read_csv(patient_info)
+        patient_info = pd.read_csv(patient_info, low_memory=False)
     if isinstance(favorite_images, str):
-        favorite_images = pd.read_csv(favorite_images)
+        favorite_images = pd.read_csv(favorite_images, low_memory=False)
     if isinstance(patient_images, str):
-        patient_images = pd.read_csv(patient_images)
+        patient_images = pd.read_csv(patient_images, low_memory=False)
 
     # Filter DataFrame for the specific doctor
     this_patient_info = patient_info[patient_info['Patient ID'] == id]
@@ -254,10 +254,9 @@ def get_pre_image_from_id(patient_info, favorite_images, patient_images, id):
 
     this_patient_image = patient_images[patient_images['Image ID'] == pre_img]
     if(this_patient_image.empty):
-        
-        # print('Patient:',this_patient_image)
         return None
     else:
+        print(this_patient_image['Image Filename'])
         return this_patient_image['Image Filename'].item()
 
 
