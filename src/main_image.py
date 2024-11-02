@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     # Create results path (if needed)
     for path in [experiment_results_path, pickles_path, path_save]:
-        os.makedirs(path)
+        os.makedirs(path, exist_ok=True)
 
 
     # Open configuration JSON
