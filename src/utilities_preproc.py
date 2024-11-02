@@ -244,10 +244,10 @@ def get_pre_image_from_id(patient_info, favorite_images, patient_images, id):
     this_patient_info = patient_info[patient_info['Patient ID'] == id]
     this_favorite_images = favorite_images[favorite_images['Patient ID'] == id]
     pre_img=' '
-    for index, row in this_patient_info.iterrows():
+    for _, row in this_patient_info.iterrows():
         surg_date = pd.to_datetime(row['Surgery Date'])
 
-    for index, row in this_favorite_images.iterrows():
+    for _, row in this_favorite_images.iterrows():
         date_difference = pd.to_datetime(row['Date'])-surg_date
         if((date_difference) <= pd.Timedelta(0)):
             pre_img = row['Image ID']
@@ -256,7 +256,6 @@ def get_pre_image_from_id(patient_info, favorite_images, patient_images, id):
     if(this_patient_image.empty):
         return None
     else:
-        print(this_patient_image['Image Filename'])
         return this_patient_image['Image Filename'].item()
 
 
@@ -673,7 +672,16 @@ def sample_manager(samples_path, pickles_path, catalogue_info, catalogue_user_in
 
         print('Modifying File Addressing')
         for QNS_element in QNS_image_list:
+            original_path = QNS_element.query_vector
+            resized_path = edit_name_incase_using_resized(samples_path, QNS_element.query_vector)
+            if not os.path.exists(resized_path):
+                resize_image(
+                    input_path=original_path,
+                    output_path=resized_path,
+                    size=(224, 224)
+                )
             QNS_element.query_vector = edit_name_incase_using_resized(samples_path, QNS_element.query_vector)
+
             for j in range(0, QNS_element.neighbor_count):
                 QNS_element.neighbor_vectors[j] = edit_name_incase_using_resized(samples_path, QNS_element.neighbor_vectors[j])
 
@@ -723,18 +731,22 @@ def sample_manager(samples_path, pickles_path, catalogue_info, catalogue_user_in
 
 
 
-# Function: Resize Images and Save In a Directory Before Training to Speed Up Training
+# Function: Resize a single image
+def resize_image(input_path, output_path, size):
+    with Image.open(input_path) as img:
+        img_resized = img.resize(size, Image.Resampling.LANCZOS)  # Use LANCZOS instead of ANTIALIAS
+        img_resized.save(output_path)
+    
+    return
+
+
+
+# Function: Resize a list of images
 def resize_images(input_dir, output_dir, size=(224, 224)):
     
     # Create the output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-
-    # Function to resize images
-    def resize_image(input_path, output_path, size):
-        with Image.open(input_path) as img:
-            img_resized = img.resize(size, Image.Resampling.LANCZOS)  # Use LANCZOS instead of ANTIALIAS
-            img_resized.save(output_path)
 
     # Process all images in the input directory
     for filename in os.listdir(input_dir):
