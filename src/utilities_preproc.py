@@ -643,9 +643,19 @@ def collaborative_tabular_normalize(qns_list, min_max_values=None):
 
 
 # Function: Sample manager
-def sample_manager(samples_path, pickle_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, default=True):
+def sample_manager(samples_path, pickles_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, default=True):
 
-    if default:
+    # Create pickles to speed-up training, if needed
+    create_pickles = None
+    if os.path.exists(os.path.join(pickles_path, 'image_train.pkl'))\
+          and os.path.exists(os.path.join(pickles_path, 'image_test.pkl'))\
+              and os.path.exists(os.path.join(pickles_path, 'tabular_train.pkl'))\
+                  and os.path.exists(os.path.join(pickles_path, 'tabular_test.pkl')):
+        create_pickles = False
+    else:
+        create_pickles = True
+
+    if create_pickles:
         print('Reading Samples...')
         QNS_image_list, QNS_image_count = get_query_neighbor_elements_path(catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info,catalogue_type=catalogue_type, doctor_code=doctor_code) # 39 57 36 -1
 
@@ -676,27 +686,27 @@ def sample_manager(samples_path, pickle_path, catalogue_info, catalogue_user_inf
         QNS_tabular_list_test  = QNS_tabular_list[int(np.floor(split_ratio * QNS_tabular_count)):]
 
         print('Saving QNS...')
-        with open(os.path.join(pickle_path, 'image_train.pkl'), 'wb') as file:
+        with open(os.path.join(pickles_path, 'image_train.pkl'), 'wb') as file:
             pickle.dump(QNS_image_list_train, file, protocol=pickle.DEFAULT_PROTOCOL)
-        with open(os.path.join(pickle_path, 'image_test.pkl'), 'wb') as file:
+        with open(os.path.join(pickles_path, 'image_test.pkl'), 'wb') as file:
             pickle.dump(QNS_image_list_test, file, protocol=pickle.DEFAULT_PROTOCOL)
 
-        with open(os.path.join(pickle_path, 'tabular_train.pkl'), 'wb') as file:
+        with open(os.path.join(pickles_path, 'tabular_train.pkl'), 'wb') as file:
             pickle.dump(QNS_tabular_list_train, file, protocol=pickle.DEFAULT_PROTOCOL)
-        with open(os.path.join(pickle_path, 'tabular_test.pkl'), 'wb') as file:
+        with open(os.path.join(pickles_path, 'tabular_test.pkl'), 'wb') as file:
             pickle.dump(QNS_tabular_list_test, file, protocol=pickle.DEFAULT_PROTOCOL)
 
     else:   
         print('Loading QNS...')
         # Load the KMeans model from the file
-        with open(os.path.join(pickle_path, 'image_train.pkl'), 'rb') as file:
+        with open(os.path.join(pickles_path, 'image_train.pkl'), 'rb') as file:
             QNS_image_list_train = pickle.load(file)
-        with open(os.path.join(pickle_path, 'image_test.pkl'), 'rb') as file:
+        with open(os.path.join(pickles_path, 'image_test.pkl'), 'rb') as file:
             QNS_image_list_test = pickle.load(file)
         
-        with open(os.path.join(pickle_path, 'tabular_train.pkl'), 'rb') as file:
+        with open(os.path.join(pickles_path, 'tabular_train.pkl'), 'rb') as file:
             QNS_tabular_list_train = pickle.load(file)
-        with open(os.path.join(pickle_path, 'tabular_test.pkl'), 'rb') as file:
+        with open(os.path.join(pickles_path, 'tabular_test.pkl'), 'rb') as file:
             QNS_tabular_list_test = pickle.load(file)
 
     # min_max_values = collaborative_tabular_normalize(QNS_tabular_list_train)

@@ -51,6 +51,7 @@ if __name__ == "__main__":
     parser.add_argument('--config_json', type=str, default="config/config_image.json", help="The JSON configuration file.")
     parser.add_argument('--images_path', type=str, required=True, help="The path to the images.")
     parser.add_argument('--csvs_path', type=str, required=True, help="The path to the CSVs with metadata.")
+    parser.add_argument('--pickles_path', type=str, required=True, help="The path to the pickle files (to speed up training).")
     parser.add_argument('--results_path', type=str, required=True, help="The path to save the results.")
     parser.add_argument('--verbose', action='store_true', default=False, help="Verbose.")
     args = parser.parse_args()
@@ -70,6 +71,7 @@ if __name__ == "__main__":
     config_json_ = args.config_json
     images_path = args.images_path
     csvs_path = args.csvs_path
+    pickles_path = args.pickles_path
     results_path = args.results_path
     verbose = args.verbose
 
@@ -80,12 +82,11 @@ if __name__ == "__main__":
     catalogue_info = os.path.join(csvs_path, 'catalogue_info.csv')
     catalogue_user_info = os.path.join(csvs_path, 'catalogue_user_info.csv')
     experiment_results_path = os.path.join(results_path, timestamp)
-    pickle_path = os.path.join(experiment_results_path, 'data', 'pickles')
     path_save = os.path.join(experiment_results_path, 'bin')
 
 
     # Create results path (if needed)
-    for path in [experiment_results_path, pickle_path, path_save]:
+    for path in [experiment_results_path, pickles_path, path_save]:
         os.makedirs(path)
 
 
@@ -123,7 +124,7 @@ if __name__ == "__main__":
     # Preprocessing
     QNS_list_image_train, QNS_list_image_test, QNS_list_tabular_train, QNS_list_tabular_test = sample_manager(
         samples_path=images_path,
-        pickle_path=pickle_path,
+        pickles_path=pickles_path,
         catalogue_info=catalogue_info,
         catalogue_user_info=catalogue_user_info,
         patient_info=patient_info,

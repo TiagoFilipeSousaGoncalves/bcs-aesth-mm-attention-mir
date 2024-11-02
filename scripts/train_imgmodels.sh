@@ -13,6 +13,7 @@ python src/main_image.py \
  --config_json 'config/config_image.json' \
  --images_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-rsz/' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
- --results_path 'results' \
+ --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv' \
+ --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results' \
  --verbose
 echo "TBD"
