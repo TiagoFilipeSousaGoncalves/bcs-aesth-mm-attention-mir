@@ -641,7 +641,7 @@ def collaborative_tabular_normalize(qns_list, min_max_values=None):
 
 
 # Function: Sample manager
-def sample_manager(images_resized_path, images_original_path, pickles_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, force_create_pickles=True):
+def sample_manager(images_resized_path, images_original_path, pickles_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, force_create_pickles=False):
 
     # Create pickles to speed-up training, if needed
     create_pickles = None
