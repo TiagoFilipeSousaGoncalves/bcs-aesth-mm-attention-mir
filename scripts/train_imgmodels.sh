@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=debug_8gb
-#SBATCH --qos=debug_8gb
+#SBATCH --partition=gpu_min11gb
+#SBATCH --qos=gpu_min11gb
 #SBATCH --job-name=imgmodels
 #SBATCH --output=imgmodels.out
 #SBATCH --error=imgmodels.err
