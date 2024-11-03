@@ -452,13 +452,14 @@ class CrossViT_Tiny240(nn.Module):
             pretrained=True, 
             num_classes=0
         )
-        model = model.eval()
         self.model = model
+        # self.model.eval()
 
         return
     
     def get_transform(self):
         def transform(image_path):
+            # self.model.eval()
             data_config = timm.data.resolve_model_data_config(self.model)
             transforms = timm.data.create_transform(**data_config, is_training=False)
             image = Image.open(image_path).convert('RGB')
