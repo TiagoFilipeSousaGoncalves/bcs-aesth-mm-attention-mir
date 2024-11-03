@@ -1,5 +1,7 @@
 # Imports
+from urllib.request import urlopen
 from PIL import Image
+import timm
 
 # PyTorch Imports
 import torch.nn as nn
@@ -438,6 +440,38 @@ class Beit_Base_Patch16_224_MLP(nn.Module):
 
 
 
+# Class: CrossViT_Tiny240
+class CrossViT_Tiny240(nn.Module):
+
+    # Method: __init__
+    def __init__(self):
+        super(CrossViT_Tiny240).__init__()
+        
+        model = timm.create_model(
+            'crossvit_tiny_240.in1k', 
+            pretrained=True, 
+            num_classes=0
+        )
+        model = model.eval()
+        self.model = model
+
+        return
+    
+    def get_transform(self):
+        def transform(image_path):
+            data_config = timm.data.resolve_model_data_config(self.model)
+            transforms = timm.data.create_transform(**data_config, is_training=False)
+            image = Image.open(image_path).convert('RGB')
+            image_trans = transforms(image).unsqueeze(0)
+            return image_trans
+        return transform
+    
+    def forward(self, input):
+        featureVec = self.model(input)
+        return featureVec
+
+
+
 # Dictionary: Models dictionary
 MODELS_DICT = {
     "Google_Base_Patch16_224": Google_Base_Patch16_224(),
@@ -451,5 +485,6 @@ MODELS_DICT = {
     "Beit_Base_Patch16_224_MLP": Beit_Base_Patch16_224_MLP(),
     "DeiT_Base_Patch16_224_MLP": DeiT_Base_Patch16_224_MLP(),
     "ResNet50_Base_224_MLP": ResNet50_Base_224_MLP(),
-    "VGG16_Base_224_MLP": VGG16_Base_224_MLP()
+    "VGG16_Base_224_MLP": VGG16_Base_224_MLP(),
+    "CrossViT_Tiny240":CrossViT_Tiny240()
 }
