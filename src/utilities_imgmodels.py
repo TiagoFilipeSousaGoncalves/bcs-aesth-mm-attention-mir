@@ -1,10 +1,27 @@
-import torchvision.transforms as transforms
-from torch.nn import functional as F
-import torch.nn as nn
+# Imports
 from PIL import Image
-from transformers import AutoImageProcessor, ViTImageProcessor, ViTModel, DeiTImageProcessor, DeiTModel, BeitImageProcessor, BeitModel, Dinov2Model
+
+# PyTorch Imports
+import torch.nn as nn
+from torch.nn import functional as F
+import torchvision.transforms as transforms
 from torchvision.models import resnet50, ResNet50_Weights, vgg16, VGG16_Weights
 
+# Transformers Imports
+from transformers import (
+    AutoImageProcessor,
+    ViTImageProcessor, 
+    ViTModel, 
+    DeiTImageProcessor, 
+    DeiTModel, 
+    BeitImageProcessor, 
+    BeitModel, 
+    Dinov2Model
+)
+
+
+
+# Class: Google_Base_Patch16_224
 class Google_Base_Patch16_224(nn.Module):
     def __init__(self):
         super().__init__()
@@ -28,6 +45,9 @@ class Google_Base_Patch16_224(nn.Module):
         featureVec = outputs.last_hidden_state[:, 0, :]  # Use outputs.last_hidden_state if no pooling
         return featureVec
 
+
+
+# Class: DeiT_Base_Patch16_224
 class DeiT_Base_Patch16_224(nn.Module):
     def __init__(self):
         super().__init__()
@@ -45,6 +65,9 @@ class DeiT_Base_Patch16_224(nn.Module):
         outputs = self.model(input)
         return outputs.last_hidden_state[:, 0, :]  # Extract the [CLS] token's embeddings
 
+
+
+# Class: Beit_Base_Patch16_224
 class Beit_Base_Patch16_224(nn.Module):
     def __init__(self):
         super().__init__()
@@ -62,6 +85,9 @@ class Beit_Base_Patch16_224(nn.Module):
         outputs = self.model(input)
         return outputs.last_hidden_state[:, 0, :]
 
+
+
+# Class: DinoV2_Base_Patch16_224
 class DinoV2_Base_Patch16_224(nn.Module):
     def __init__(self):
         super().__init__()
@@ -79,7 +105,10 @@ class DinoV2_Base_Patch16_224(nn.Module):
         outputs = self.model(input)
         return outputs.last_hidden_state[:, 0, :]
 
-class ResNet50_Base_224 (nn.Module):
+
+
+# Class: ResNet50_Base_224
+class ResNet50_Base_224(nn.Module):
     def __init__(self, weights=ResNet50_Weights.DEFAULT):
         super().__init__()
         # Load the pre-trained ResNet50 model
@@ -119,6 +148,9 @@ class ResNet50_Base_224 (nn.Module):
             return transform(image)
         return transform
 
+
+
+# Class: VGG16_Base_224
 class VGG16_Base_224(nn.Module):
     def __init__(self, weights=VGG16_Weights.DEFAULT):
         super().__init__()
@@ -159,6 +191,9 @@ class VGG16_Base_224(nn.Module):
             return transform(image)
         return transform
 
+
+
+# Class: VGG16_Base_224_MLP
 class VGG16_Base_224_MLP(nn.Module):
     def __init__(self, weights=VGG16_Weights.DEFAULT, feature_dim=512, embedding_size=256):
         super().__init__()
@@ -213,6 +248,9 @@ class VGG16_Base_224_MLP(nn.Module):
             return transform(image)
         return transform
 
+
+
+# Class: Google_Base_Patch16_224_MLP
 class Google_Base_Patch16_224_MLP(nn.Module):
     def __init__(self):
         super(Google_Base_Patch16_224_MLP, self).__init__()
@@ -243,6 +281,9 @@ class Google_Base_Patch16_224_MLP(nn.Module):
         featureVec = self.relu2(x)
         return featureVec
 
+
+
+# Class: ResNet50_Base_224_MLP
 class ResNet50_Base_224_MLP(nn.Module):
     def __init__(self, feature_dim=2048, embedding_size=512, weights=ResNet50_Weights.DEFAULT):
         super().__init__()
@@ -299,6 +340,9 @@ class ResNet50_Base_224_MLP(nn.Module):
             return transform(image)
         return transform
 
+
+
+# Class: DeiT_Base_Patch16_224_MLP
 class DeiT_Base_Patch16_224_MLP(nn.Module):
     def __init__(self):
         super(DeiT_Base_Patch16_224_MLP, self).__init__()
@@ -328,6 +372,9 @@ class DeiT_Base_Patch16_224_MLP(nn.Module):
         featureVec = self.relu2(x)
         return featureVec
 
+
+
+# Class: DinoV2_Base_Patch16_224_MLP
 class DinoV2_Base_Patch16_224_MLP(nn.Module):
     def __init__(self):
         super(DinoV2_Base_Patch16_224_MLP, self).__init__()
@@ -357,6 +404,9 @@ class DinoV2_Base_Patch16_224_MLP(nn.Module):
         featureVec = self.relu2(x)
         return featureVec
 
+
+
+# Class: Beit_Base_Patch16_224_MLP
 class Beit_Base_Patch16_224_MLP(nn.Module):
     def __init__(self):
         super(Beit_Base_Patch16_224_MLP, self).__init__()

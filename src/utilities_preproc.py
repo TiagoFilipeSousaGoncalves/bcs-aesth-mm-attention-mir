@@ -654,7 +654,7 @@ def sample_manager(images_resized_path, images_original_path, pickles_path, cata
         create_pickles = True
 
     if create_pickles or force_create_pickles:
-        print('Reading Samples...')
+        # print('Reading Samples...')
         QNS_image_list, QNS_image_count = get_query_neighbor_elements_path(catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info,catalogue_type=catalogue_type, doctor_code=doctor_code) # 39 57 36 -1
 
         QNS_tabular_list, QNS_tabular_count = get_query_neighbor_elements(catalogue_info, catalogue_user_info, patient_info, doctor_code=doctor_code)
@@ -666,11 +666,11 @@ def sample_manager(images_resized_path, images_original_path, pickles_path, cata
         # for q in QNS_tabular_list:
         #     q.show_summary()
         
-        print('Shuffling Samples...')
+        # print('Shuffling Samples...')
         np.random.shuffle(QNS_image_list)
         np.random.shuffle(QNS_tabular_list)
 
-        print('Modifying File Addressing')
+        # print('Modifying File Addressing')
         for QNS_element in QNS_image_list:
             original_path = QNS_element.query_vector
             resized_path = edit_name_incase_using_resized(
@@ -696,14 +696,14 @@ def sample_manager(images_resized_path, images_original_path, pickles_path, cata
                 )
                 QNS_element.neighbor_vectors[j] = resized_path
 
-        print('Train-Test Split...')
+        # print('Train-Test Split...')
         QNS_image_list_train = QNS_image_list[:int(np.floor(split_ratio * QNS_image_count))]
         QNS_image_list_test  = QNS_image_list[int(np.floor(split_ratio * QNS_image_count)):]
 
         QNS_tabular_list_train = QNS_tabular_list[:int(np.floor(split_ratio * QNS_tabular_count))]
         QNS_tabular_list_test  = QNS_tabular_list[int(np.floor(split_ratio * QNS_tabular_count)):]
 
-        print('Saving QNS...')
+        # print('Saving QNS...')
         with open(os.path.join(pickles_path, 'image_train.pkl'), 'wb') as file:
             pickle.dump(QNS_image_list_train, file, protocol=pickle.DEFAULT_PROTOCOL)
         with open(os.path.join(pickles_path, 'image_test.pkl'), 'wb') as file:
@@ -715,7 +715,7 @@ def sample_manager(images_resized_path, images_original_path, pickles_path, cata
             pickle.dump(QNS_tabular_list_test, file, protocol=pickle.DEFAULT_PROTOCOL)
 
     else:   
-        print('Loading QNS...')
+        # print('Loading QNS...')
         # Load the KMeans model from the file
         with open(os.path.join(pickles_path, 'image_train.pkl'), 'rb') as file:
             QNS_image_list_train = pickle.load(file)
