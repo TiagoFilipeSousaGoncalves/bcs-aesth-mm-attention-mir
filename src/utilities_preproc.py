@@ -641,7 +641,7 @@ def collaborative_tabular_normalize(qns_list, min_max_values=None):
 
 
 # Function: Sample manager
-def sample_manager(samples_path, pickles_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, default=True):
+def sample_manager(samples_path, pickles_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, force_create_pickles=True):
 
     # Create pickles to speed-up training, if needed
     create_pickles = None
@@ -653,7 +653,7 @@ def sample_manager(samples_path, pickles_path, catalogue_info, catalogue_user_in
     else:
         create_pickles = True
 
-    if create_pickles:
+    if create_pickles or force_create_pickles:
         print('Reading Samples...')
         QNS_image_list, QNS_image_count = get_query_neighbor_elements_path(catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info,catalogue_type=catalogue_type, doctor_code=doctor_code) # 39 57 36 -1
 
