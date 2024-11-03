@@ -463,7 +463,7 @@ class CrossViT_Tiny240(nn.Module):
             data_config = timm.data.resolve_model_data_config(self.model)
             transforms = timm.data.create_transform(**data_config, is_training=False)
             image = Image.open(image_path).convert('RGB')
-            image_trans = transforms(image).unsqueeze(0)
+            image_trans = transforms(image)
             return image_trans
         return transform
     
