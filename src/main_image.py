@@ -125,7 +125,6 @@ if __name__ == "__main__":
 
     # Preprocessing
     QNS_list_image_train, QNS_list_image_test, QNS_list_tabular_train, QNS_list_tabular_test = sample_manager(
-        samples_path=images_path,
         images_resized_path=images_resized_path,
         images_original_path=images_original_path,
         pickles_path=pickles_path,
@@ -136,8 +135,7 @@ if __name__ == "__main__":
         patient_images_info=patient_images_info,
         catalogue_type=config_json["catalogue_type"],
         doctor_code=config_json["doctor_code"],
-        split_ratio=config_json["split_ratio"],
-        default=False
+        split_ratio=config_json["split_ratio"]
     )
 
     # for q in QNS_list_image_train:
@@ -158,11 +156,11 @@ if __name__ == "__main__":
     num_epochs = config_json["num_epochs"]
 
     # Train Dataset & Dataloader
-    train_dataset = TripletDataset(images_path, QNS_list_image_train, transform=model.get_transform())
+    train_dataset = TripletDataset(images_resized_path, QNS_list_image_train, transform=model.get_transform())
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False) # later it should bea turned on ...
 
     # Test Dataset & Dataloader
-    test_dataset = TripletDataset(images_path, QNS_list_image_test,  transform=model.get_transform())
+    test_dataset = TripletDataset(images_resized_path, QNS_list_image_test,  transform=model.get_transform())
     test_loader = DataLoader(test_dataset,  batch_size=batch_size, shuffle=False)
     
     # Loss function and Optimizer
