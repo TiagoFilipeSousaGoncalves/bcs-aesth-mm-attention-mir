@@ -677,28 +677,30 @@ def sample_manager(images_resized_path, images_original_path, pickles_path, cata
                 path=images_resized_path, 
                 filename=QNS_element.query_vector
             )
-            if not os.path.exists(resized_path):
-                resize_image(
-                    input_path=os.path.join(images_original_path, original_path),
-                    output_path=resized_path,
-                    size=(224, 224)
-                )
-            QNS_element.query_vector = edit_name_incase_using_resized(
-                path=images_resized_path, 
-                filename=QNS_element.query_vector
+            resize_image(
+                input_path=os.path.join(images_original_path, original_path),
+                output_path=resized_path,
+                size=(224, 224)
             )
+            QNS_element.query_vector = resized_path
 
             for j in range(0, QNS_element.neighbor_count):
-                QNS_element.neighbor_vectors[j] = edit_name_incase_using_resized(
+                resized_path = edit_name_incase_using_resized(
                     path=images_resized_path, 
                     filename=QNS_element.neighbor_vectors[j]
                 )
+                resize_image(
+                    input_path=os.path.join(images_original_path, QNS_element.neighbor_vectors[j]),
+                    output_path=resized_path,
+                    size=(224, 224)
+                )
+                QNS_element.neighbor_vectors[j] = resized_path
 
         print('Train-Test Split...')
-        QNS_image_list_train = QNS_image_list[: int(np.floor(split_ratio * QNS_image_count))]
+        QNS_image_list_train = QNS_image_list[:int(np.floor(split_ratio * QNS_image_count))]
         QNS_image_list_test  = QNS_image_list[int(np.floor(split_ratio * QNS_image_count)):]
 
-        QNS_tabular_list_train = QNS_tabular_list[: int(np.floor(split_ratio * QNS_tabular_count))]
+        QNS_tabular_list_train = QNS_tabular_list[:int(np.floor(split_ratio * QNS_tabular_count))]
         QNS_tabular_list_test  = QNS_tabular_list[int(np.floor(split_ratio * QNS_tabular_count)):]
 
         print('Saving QNS...')
@@ -733,8 +735,6 @@ def sample_manager(images_resized_path, images_original_path, pickles_path, cata
 
     # for q in QNS_tabular_list_test:
     #     q.show_summary(str=False)
-
-    print('Done!')
 
     return QNS_image_list_train, QNS_image_list_test, QNS_tabular_list_train, QNS_tabular_list_test
 

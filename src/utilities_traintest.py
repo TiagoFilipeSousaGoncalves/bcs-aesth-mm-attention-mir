@@ -19,15 +19,22 @@ class TripletDataset(Dataset):
 
     # Method: __init__
     def __init__(self, path, QNS_list, transform):
-        
+
+        # Class variables
         self.transform = transform
         self.path = path
-        # precompute all combination of the triplets
+
+        # Pre-compute all combination of the triplets
         self.triplets = []
         for qns_element in QNS_list:
             for pair in combinations(range(qns_element.neighbor_count), 2):
-                self.triplets.append((qns_element.query_vector, qns_element.
-                neighbor_vectors[pair[0]], qns_element.neighbor_vectors[pair[1]]))
+                self.triplets.append(
+                    (
+                        qns_element.query_vector,
+                        qns_element.neighbor_vectors[pair[0]],
+                        qns_element.neighbor_vectors[pair[1]]
+                    )
+                )
 
         return
 
