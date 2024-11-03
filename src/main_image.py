@@ -18,6 +18,10 @@ from utilities_imgmodels import MODELS_DICT as models_dict
 from utilities_preproc import sample_manager
 from utilities_traintest import TripletDataset, train_triplets, save_model
 
+# WandB Imports
+import wandb
+
+
 
 # Function: See the seed for reproducibility purposes
 def set_seed(seed=10):
@@ -58,11 +62,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 
-    # TODO: Erase after testing
-    # Required Paths
-    # current_directory = os.getcwd()
-    # images_path='../data/images/'
-    # csvs_path ='../data/csvs/'
+    # Build a configuration dictionary for WandB
+    wandb_project_config = dict()
     
     # Create a timestamp for the experiment
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -110,18 +111,28 @@ if __name__ == "__main__":
     if verbose:
         print(f"Using device: {device}")
 
-    # Configs
-    # np.random.seed(10)
-    # torch.manual_seed(10)
-    # device = "cuda:0" # "mps" if torch.backends.mps.is_available() else "cpu"
-    # print(f"Using device: {device}")
-    # lr=0.00001
-    # num_epochs=1
-    # batch_size=16
-    # margin = 0.0001
-    # split_ratio=0.8
-    # catalogue_type = 'E'
-    # doctor_code=-1 # 39 57 36 -1
+
+
+    # Add information to WandB
+    wandb_project_config["seed"] = config_json["seed"]
+    wandb_project_config["lr"] = config_json["lr"]
+    wandb_project_config["num_epochs"] = config_json["num_epochs"]
+    wandb_project_config[ "batch_size"] = config_json[ "batch_size"]
+    wandb_project_config["margin"] = config_json["margin"]
+    wandb_project_config["split_ratio"] = config_json["split_ratio"]
+    wandb_project_config["catalogue_type"] = config_json["catalogue_type"]
+    wandb_project_config["doctor_code"] = config_json["doctor_code"]
+    wandb_project_config["model_name"] = config_json["model_name"]
+
+    # Initialize WandB
+    wandb_run = wandb.init(
+        project="bcs-aesth-mm-attention-mir",
+        name=config_json["model_name"]+'_'+timestamp,
+        config=wandb_project_config
+    )
+    assert wandb_run is wandb.run
+
+
 
     # Preprocessing
     QNS_list_image_train, QNS_list_image_test, QNS_list_tabular_train, QNS_list_tabular_test = sample_manager(
@@ -138,14 +149,16 @@ if __name__ == "__main__":
         split_ratio=config_json["split_ratio"]
     )
 
-    # for q in QNS_list_image_train:
-    #     q.show_summary()
-    # for q in QNS_list_tabular_train:
-    #     q.show_summary(str=False)
 
-    # # Down-Sampeling
-    # QNS_list_image_train = QNS_list_image_train[0:2]
-    # QNS_list_image_test = QNS_list_image_test[0:2]
+
+    if verbose:
+        print("Summary of QNS:")
+        for q in QNS_list_image_train:
+            q.show_summary()
+        for q in QNS_list_tabular_train:
+            q.show_summary(str=False)
+
+
 
     # Create Model and Hyperparameters
     model_name = config_json["model_name"]
@@ -179,9 +192,9 @@ if __name__ == "__main__":
         optimizer,
         criterion,
         num_epochs=num_epochs,
-        model_name=model_name,
         device=device,
-        path_save=path_save
+        path_save=path_save,
+        wandb_run=wandb_run
     )
     
     # Save model

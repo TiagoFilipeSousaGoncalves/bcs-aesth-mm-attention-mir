@@ -64,78 +64,70 @@ class TripletDataset(Dataset):
 
 
 # Function: Train models using triplet loss
-def train_triplets(model, train_loader, test_loader, QNS_list_train, QNS_list_test, optimizer, criterion, num_epochs, model_name, device, path_save):
-    
-    # Open a log file in append mode to save all logs
-    with open(os.path.join(path_save, 'train.log'), 'a') as f:
+def train_triplets(model, train_loader, test_loader, QNS_list_train, QNS_list_test, optimizer, criterion, num_epochs, device, path_save, wandb_run):
 
-        # Save the original stdout
-        # original_stdout = sys.stdout
-        # sys.stdout = f
-        
-        # Log into file
-        f.write(f'Model Name: {model}\n')
-        
-        # Alocate model to the device
-        model.to(device)
+    # Alocate model to the device
+    model.to(device)
 
-        # Set model to training mode
-        model.train()
+    # Set model to training mode
+    model.train()
 
-        # Initialise metrics
-        best_acc = float('-inf')
+    # Initialise metrics
+    best_acc = float('-inf')
 
-        # Go through epochs
-        for epoch in range(num_epochs):
-            running_loss = 0.0
-            for data in train_loader:
+    # Go through epochs
+    for epoch in range(num_epochs):
+        running_loss = 0.0
+        for data in train_loader:
 
-                # Zero the parameter gradients
-                optimizer.zero_grad()
+            # Zero the parameter gradients
+            optimizer.zero_grad()
 
-                # Get data
-                queries = data['query'].to(device)
-                positives = data['pos'].to(device)
-                negatives = data['neg'].to(device)
-                
-                # Forward pass to get outputs and calculate loss
-                anchor_embeddings = model(queries)
-                pos_embeddings = model(positives)
-                neg_embeddings = model(negatives)
-                loss = criterion(anchor_embeddings, pos_embeddings, neg_embeddings)
-                
-                # Backward and optimize
-                loss.backward()
-                optimizer.step()
-                
-                # Statistics
-                running_loss += loss.item() * queries.size(0)
+            # Get data
+            queries = data['query'].to(device)
+            positives = data['pos'].to(device)
+            negatives = data['neg'].to(device)
             
-            # Epoch Loss
-            epoch_loss = running_loss
-
-            # Accuracy
-            train_acc = evaluate_triplets(model, train_loader, device)
-            test_acc  = evaluate_triplets(model, test_loader, device)
-
-            # NDCG
-            train_nddg = evaluate_nddg(QNS_list_train, model, transform=model.get_transform(), device=device)[0]
-            test_nddg = evaluate_nddg(QNS_list_test, model, transform=model.get_transform(), device=device)[0]
-
-            current_time = datetime.now()
-            f.write(f'[{current_time.strftime("%Y-%m-%d %H:%M:%S")}] Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Train-Acc: {train_acc:.5f}, Test-Acc: {test_acc:.5f} Train-NDDG: {train_nddg} Test-NDDG: {test_nddg}')
-    
-            # Saving
-            if test_acc > best_acc:
-                best_acc = test_acc
-                torch.save(model.state_dict(), os.path.join(path_save, f"model_best_epoc{epoch}.pt"))
-                f.write(f"New best model saved with accuracy: {best_acc:.5f}")
+            # Forward pass to get outputs and calculate loss
+            anchor_embeddings = model(queries)
+            pos_embeddings = model(positives)
+            neg_embeddings = model(negatives)
+            loss = criterion(anchor_embeddings, pos_embeddings, neg_embeddings)
+            
+            # Backward and optimize
+            loss.backward()
+            optimizer.step()
+            
+            # Statistics
+            running_loss += loss.item() * queries.size(0)
         
+        # Epoch Loss
+        epoch_loss = running_loss
 
-        f.write('Finished Training')
+        # Accuracy
+        train_acc = evaluate_triplets(model, train_loader, device)
+        test_acc  = evaluate_triplets(model, test_loader, device)
 
-        # Reset stdout to original
-        # sys.stdout = original_stdout
+        # Compute nDCG
+        train_ndcg = evaluate_ndcg(QNS_list_train, model, transform=model.get_transform(), device=device)[0]
+        test_ndcg = evaluate_ndcg(QNS_list_test, model, transform=model.get_transform(), device=device)[0]
+
+        # Log into WandB
+        wandb_run.log(
+            {
+                "epoch":epoch,
+                "loss":epoch_loss,
+                "train_acc":train_acc,
+                "test_acc":test_acc,
+                "train_ndcg":train_ndcg,
+                "test_ndcg":test_ndcg
+            }
+        )
+
+        # Save best model based on accuracy
+        if test_acc > best_acc:
+            best_acc = test_acc
+            torch.save(model.state_dict(), os.path.join(path_save, f"model_best_epoc{epoch}.pt"))
 
     return model, epoch_loss, epoch
 
@@ -198,7 +190,7 @@ def evaluate_triplets(model, data_loader, device):
 
 
 # Function: Evaluate models using nDCG metric
-def evaluate_nddg(QNS_list, model, transform, device):
+def evaluate_ndcg(QNS_list, model, transform, device):
 
     # Create a list for the order of the retrieved images
     final_order = []
