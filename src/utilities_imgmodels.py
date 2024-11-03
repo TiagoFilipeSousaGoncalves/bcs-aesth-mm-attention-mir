@@ -445,7 +445,7 @@ class CrossViT_Tiny240(nn.Module):
 
     # Method: __init__
     def __init__(self):
-        super(CrossViT_Tiny240).__init__()
+        super(CrossViT_Tiny240, self).__init__()
         
         model = timm.create_model(
             'crossvit_tiny_240.in1k', 
