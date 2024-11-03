@@ -468,6 +468,7 @@ class CrossViT_Tiny240(nn.Module):
         return transform
     
     def forward(self, input):
+        print(input.shape)
         featureVec = self.model(input)
         return featureVec
 
