@@ -641,7 +641,7 @@ def collaborative_tabular_normalize(qns_list, min_max_values=None):
 
 
 # Function: Sample manager
-def sample_manager(samples_path, pickles_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, force_create_pickles=True):
+def sample_manager(images_resized_path, images_original_path, pickles_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, force_create_pickles=True):
 
     # Create pickles to speed-up training, if needed
     create_pickles = None
@@ -673,17 +673,26 @@ def sample_manager(samples_path, pickles_path, catalogue_info, catalogue_user_in
         print('Modifying File Addressing')
         for QNS_element in QNS_image_list:
             original_path = QNS_element.query_vector
-            resized_path = edit_name_incase_using_resized(samples_path, QNS_element.query_vector)
+            resized_path = edit_name_incase_using_resized(
+                path=images_resized_path, 
+                filename=QNS_element.query_vector
+            )
             if not os.path.exists(resized_path):
                 resize_image(
-                    input_path=original_path,
+                    input_path=os.path.join(images_original_path, original_path),
                     output_path=resized_path,
                     size=(224, 224)
                 )
-            QNS_element.query_vector = edit_name_incase_using_resized(samples_path, QNS_element.query_vector)
+            QNS_element.query_vector = edit_name_incase_using_resized(
+                path=images_resized_path, 
+                filename=QNS_element.query_vector
+            )
 
             for j in range(0, QNS_element.neighbor_count):
-                QNS_element.neighbor_vectors[j] = edit_name_incase_using_resized(samples_path, QNS_element.neighbor_vectors[j])
+                QNS_element.neighbor_vectors[j] = edit_name_incase_using_resized(
+                    path=images_resized_path, 
+                    filename=QNS_element.neighbor_vectors[j]
+                )
 
         print('Train-Test Split...')
         QNS_image_list_train = QNS_image_list[: int(np.floor(split_ratio * QNS_image_count))]

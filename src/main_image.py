@@ -49,7 +49,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='CINDERELLA BreLoAI Retrieval: Model Training, with image data.')
     parser.add_argument('--gpu_id', type=int, default=0, help="The ID of the GPU we will use to run the program.")
     parser.add_argument('--config_json', type=str, default="config/config_image.json", help="The JSON configuration file.")
-    parser.add_argument('--images_path', type=str, required=True, help="The path to the images.")
+    parser.add_argument('--images_resized_path', type=str, required=True, help="The path to the resized images.")
+    parser.add_argument('--images_original_path', type=str, required=True, help="The path to the original images.")
     parser.add_argument('--csvs_path', type=str, required=True, help="The path to the CSVs with metadata.")
     parser.add_argument('--pickles_path', type=str, required=True, help="The path to the pickle files (to speed up training).")
     parser.add_argument('--results_path', type=str, required=True, help="The path to save the results.")
@@ -69,7 +70,8 @@ if __name__ == "__main__":
     # Get arguments
     gpu_id = args.gpu_id
     config_json_ = args.config_json
-    images_path = args.images_path
+    images_resized_path = args.images_resized_path
+    images_original_path = args.images_original_path
     csvs_path = args.csvs_path
     pickles_path = args.pickles_path
     results_path = args.results_path
@@ -124,6 +126,8 @@ if __name__ == "__main__":
     # Preprocessing
     QNS_list_image_train, QNS_list_image_test, QNS_list_tabular_train, QNS_list_tabular_test = sample_manager(
         samples_path=images_path,
+        images_resized_path=images_resized_path,
+        images_original_path=images_original_path,
         pickles_path=pickles_path,
         catalogue_info=catalogue_info,
         catalogue_user_info=catalogue_user_info,
