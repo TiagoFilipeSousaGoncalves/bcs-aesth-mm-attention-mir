@@ -170,11 +170,23 @@ if __name__ == "__main__":
 
     # Train Dataset & Dataloader
     train_dataset = TripletDataset(images_resized_path, QNS_list_image_train, transform=model.get_transform())
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False) # later it should bea turned on ...
+    train_loader = DataLoader(
+        dataset=train_dataset, 
+        batch_size=batch_size, 
+        shuffle=True,
+        num_workers=4,
+        pin_memory=True
+    )
 
     # Test Dataset & Dataloader
-    test_dataset = TripletDataset(images_resized_path, QNS_list_image_test,  transform=model.get_transform())
-    test_loader = DataLoader(test_dataset,  batch_size=batch_size, shuffle=False)
+    test_dataset = TripletDataset(images_resized_path, QNS_list_image_test, transform=model.get_transform())
+    test_loader = DataLoader(
+        dataset=test_dataset, 
+        batch_size=batch_size, 
+        shuffle=False,
+        num_workers=4,
+        pin_memory=True
+    )
     
     # Loss function and Optimizer
     criterion = TripletMarginLoss(margin=margin, p=2)
