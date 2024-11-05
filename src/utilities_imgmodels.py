@@ -448,15 +448,12 @@ class CrossViT_Tiny240(nn.Module):
     # Method: __init__
     def __init__(self):
         super(CrossViT_Tiny240, self).__init__()
-        
         model = timm.create_model(
             'crossvit_tiny_240.in1k', 
             pretrained=True, 
             num_classes=0
         )
         self.model = model
-        # self.model.eval()
-
         return
     
     def get_transform(self):
@@ -470,48 +467,41 @@ class CrossViT_Tiny240(nn.Module):
         return transform
     
     def forward(self, input):
-        # print(input.shape)
         featureVec = self.model(input)
         return featureVec
 
 
 
-# Class: LeViT_256
-class LeViT_256(nn.Module):
+# Class: LeViTConv256
+class LeViTConv256(nn.Module):
 
     # Method: __init__
     def __init__(self):
-        super(LeViT_256, self).__init__()
-
-        self.feature_extractor = LevitImageProcessor.from_pretrained('facebook/levit-256')
-        self.model = LevitForImageClassificationWithTeacher.from_pretrained('facebook/levit-256')
-
-        # [WIP] Use an Indentity layer in the Classifier head(s) to get the last hidden states
-        # self.model.classifier = nn.Identity()
-        # self.model.classifier_distill = nn.Identity()
-        # print(self.model)
-
+        super(LeViTConv256, self).__init__()
+        model = timm.create_model(
+            'levit_conv_256.fb_dist_in1k',
+            pretrained=True,
+            num_classes=0
+        )
+        self.model = model
         return
     
 
     # Method: get_transforms
     def get_transform(self):
         def transform(image_path):
+            data_config = timm.data.resolve_model_data_config(self.model)
+            transforms = timm.data.create_transform(**data_config, is_training=False)
             image = Image.open(image_path).convert('RGB')
-            processed = self.feature_extractor(images=image, return_tensors="pt")
-            image_trans = processed['pixel_values'].squeeze(0)
+            image_trans = transforms(image)
             return image_trans
         return transform
     
 
     # Method: forward
     def forward(self, input):
-
         featureVec = self.model(input)
-        # print(featureVec['logits'].shape, featureVec['cls_logits'].shape)
-        # print(featureVec['logits'], featureVec['cls_logits'])
-        
-        return featureVec['cls_logits']
+        return featureVec
 
 
 
@@ -558,13 +548,13 @@ MODELS_DICT = {
     "DinoV2_Base_Patch16_224":DinoV2_Base_Patch16_224(),
     "ResNet50_Base_224":ResNet50_Base_224(),
     "VGG16_Base_224":VGG16_Base_224(),
+    "CrossViT_Tiny240":CrossViT_Tiny240(),
+    "LeViTConv256":LeViTConv256(),
+    "ConViT_Tiny":ConViT_Tiny(),
     "Google_Base_Patch16_224_MLP":Google_Base_Patch16_224_MLP(),
     "DinoV2_Base_Patch16_224_MLP":DinoV2_Base_Patch16_224_MLP(),
     "Beit_Base_Patch16_224_MLP":Beit_Base_Patch16_224_MLP(),
     "DeiT_Base_Patch16_224_MLP":DeiT_Base_Patch16_224_MLP(),
     "ResNet50_Base_224_MLP":ResNet50_Base_224_MLP(),
-    "VGG16_Base_224_MLP":VGG16_Base_224_MLP(),
-    "CrossViT_Tiny240":CrossViT_Tiny240(),
-    "LeViT_256":LeViT_256(),
-    "ConViT_Tiny":ConViT_Tiny()
+    "VGG16_Base_224_MLP":VGG16_Base_224_MLP()
 }

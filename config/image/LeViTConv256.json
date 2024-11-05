@@ -7,5 +7,5 @@
     "split_ratio":0.8,
     "catalogue_type":"E",
     "doctor_code":-1,
-    "model_name":"LeViT_256"
+    "model_name":"LeViTConv256"
 }
