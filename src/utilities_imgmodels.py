@@ -515,6 +515,41 @@ class LeViT_256(nn.Module):
 
 
 
+# Class: ConViT_Tiny
+class ConViT_Tiny(nn.Module):
+
+    # Method: __init__
+    def __init__(self):
+        super(ConViT_Tiny, self).__init__()
+        
+        model = timm.create_model(
+            'convit_tiny.fb_in1k',
+            pretrained=True,
+            num_classes=0
+        )
+        self.model = model
+
+        return
+
+
+    # Method: get_transform
+    def get_transform(self):
+        def transform(image_path):
+            data_config = timm.data.resolve_model_data_config(self.model)
+            transforms = timm.data.create_transform(**data_config, is_training=False)
+            image = Image.open(image_path).convert('RGB')
+            image_trans = transforms(image)
+            return image_trans
+        return transform
+
+
+    # Method: forward
+    def forward(self, input):
+        featureVec = self.model(input)
+        return featureVec
+
+
+
 # Dictionary: Models dictionary
 MODELS_DICT = {
     "Google_Base_Patch16_224":Google_Base_Patch16_224(),
@@ -530,5 +565,6 @@ MODELS_DICT = {
     "ResNet50_Base_224_MLP":ResNet50_Base_224_MLP(),
     "VGG16_Base_224_MLP":VGG16_Base_224_MLP(),
     "CrossViT_Tiny240":CrossViT_Tiny240(),
-    "LeViT_256":LeViT_256()
+    "LeViT_256":LeViT_256(),
+    "ConViT_Tiny":ConViT_Tiny()
 }
