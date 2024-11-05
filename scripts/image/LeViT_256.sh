@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=gpu_min11gb
-#SBATCH --qos=gpu_min11gb
+#SBATCH --partition=gpu_min24gb
+#SBATCH --qos=gpu_min24gb
 #SBATCH --job-name=cind_breloai_att_ret
 #SBATCH --output=LeViT_256.out
 #SBATCH --error=LeViT_256.err
