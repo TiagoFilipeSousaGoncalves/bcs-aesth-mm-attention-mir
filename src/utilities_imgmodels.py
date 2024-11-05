@@ -487,6 +487,7 @@ class LeViT_256(nn.Module):
         self.model = LevitForImageClassificationWithTeacher.from_pretrained('facebook/levit-256')
         self.model.head = nn.Identity()
         self.model.head_dist = nn.Identity()
+        print(self.model)
 
         return
     
