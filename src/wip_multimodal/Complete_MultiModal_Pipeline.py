@@ -16,7 +16,7 @@ from PreprocessingUtilities import Sample_Manager,get_query_neighbor_elements_pa
 from torch.utils.data import DataLoader
 from torch.nn import TripletMarginLoss
 
-from TabularUtilities import TabularMLP
+from wip_multimodal.TabularUtilities import TabularMLP
 from TrainTestUtilities import TripletDataset, train_triplets, save_model, evaluate_nddg
 from PreprocessingUtilities import Sample_Manager
 
