@@ -506,9 +506,11 @@ class LeViT_256(nn.Module):
 
     # Method: forward
     def forward(self, input):
+        
         featureVec = self.model(input)
-        print(featureVec['logits'].shape, featureVec['cls_logits'].shape)
-        print(featureVec['logits'], featureVec['cls_logits'])
+        # print(featureVec['logits'].shape, featureVec['cls_logits'].shape)
+        # print(featureVec['logits'], featureVec['cls_logits'])
+        
         return featureVec['logits']
 
 
