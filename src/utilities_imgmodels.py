@@ -18,7 +18,9 @@ from transformers import (
     DeiTModel, 
     BeitImageProcessor, 
     BeitModel, 
-    Dinov2Model
+    Dinov2Model,
+    LevitForImageClassificationWithTeacher,
+    LevitFeatureExtractor
 )
 
 
@@ -36,8 +38,8 @@ class Google_Base_Patch16_224(nn.Module):
             image = Image.open(image_path).convert('RGB')
             processed = self.feature_extractor(images=image, return_tensors="pt")
             # pixel_values = processed['pixel_values']
-            #pixel_values = pixel_values.permute(0, 2, 3, 1)
-            #return pixel_values
+            # pixel_values = pixel_values.permute(0, 2, 3, 1)
+            # return pixel_values
             return processed['pixel_values'].squeeze(0)
         return transform
     
@@ -468,7 +470,39 @@ class CrossViT_Tiny240(nn.Module):
         return transform
     
     def forward(self, input):
-        print(input.shape)
+        # print(input.shape)
+        featureVec = self.model(input)
+        return featureVec
+
+
+
+# Class: LeViT_256
+class LeViT_256(nn.Module):
+
+    # Method: __init__
+    def __init__(self):
+        super(LeViT_256, self).__init__()
+        
+        self.feature_extractor = LevitFeatureExtractor.from_pretrained('facebook/levit-256')
+        self.model = LevitForImageClassificationWithTeacher.from_pretrained('facebook/levit-256')
+        self.model.head = nn.Identity()
+
+        return
+    
+
+    # Method: get_transforms
+    def get_transform(self):
+        def transform(image_path):
+            image = Image.open(image_path).convert('RGB')
+            processed = self.feature_extractor(images=image, return_tensors="pt")
+            image_trans = processed['pixel_values'].squeeze(0)
+            return image_trans
+        return transform
+    
+
+    # Method: forward
+    def forward(self, input):
+        # print(input.shape)
         featureVec = self.model(input)
         return featureVec
 
@@ -488,5 +522,6 @@ MODELS_DICT = {
     "DeiT_Base_Patch16_224_MLP":DeiT_Base_Patch16_224_MLP(),
     "ResNet50_Base_224_MLP":ResNet50_Base_224_MLP(),
     "VGG16_Base_224_MLP":VGG16_Base_224_MLP(),
-    "CrossViT_Tiny240":CrossViT_Tiny240()
+    "CrossViT_Tiny240":CrossViT_Tiny240(),
+    "LeViT_256":LeViT_256()
 }
