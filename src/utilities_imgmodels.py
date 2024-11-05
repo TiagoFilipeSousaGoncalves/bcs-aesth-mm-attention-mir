@@ -540,8 +540,109 @@ class ConViT_Tiny(nn.Module):
 
 
 
+# Class: MaxViT_Tiny_224
+class MaxViT_Tiny_224(nn.Module):
+
+    # Method: __init__
+    def __init__(self):
+        super(MaxViT_Tiny_224, self).__init__()
+        model = timm.create_model(
+            'maxvit_tiny_tf_224.in1k',
+            pretrained=True,
+            num_classes=0
+        )
+        self.model = model
+        return
+    
+
+    # Method: get_transforms
+    def get_transform(self):
+        def transform(image_path):
+            data_config = timm.data.resolve_model_data_config(self.model)
+            transforms = timm.data.create_transform(**data_config, is_training=False)
+            image = Image.open(image_path).convert('RGB')
+            image_trans = transforms(image)
+            return image_trans
+        return transform
+    
+
+    # Method: forward
+    def forward(self, input):
+        featureVec = self.model(input)
+        return featureVec
+
+
+
+# Class MViTv2_Tiny
+class MViTv2_Tiny(nn.Module):
+
+    # Method: __init__
+    def __init__(self):
+        super(MViTv2_Tiny, self).__init__()
+        model = timm.create_model(
+            'mvitv2_tiny.fb_in1k',
+            pretrained=True,
+            num_classes=0
+        )
+        self.model = model
+        return
+    
+
+    # Method: get_transforms
+    def get_transform(self):
+        def transform(image_path):
+            data_config = timm.data.resolve_model_data_config(self.model)
+            transforms = timm.data.create_transform(**data_config, is_training=False)
+            image = Image.open(image_path).convert('RGB')
+            image_trans = transforms(image)
+            return image_trans
+        return transform
+    
+
+    # Method: forward
+    def forward(self, input):
+        featureVec = self.model(input)
+        return featureVec
+
+
+
+# Class DaViT_Tiny
+class DaViT_Tiny(nn.Module):
+
+    # Method: __init__
+    def __init__(self):
+        super(DaViT_Tiny, self).__init__()
+        model = timm.create_model(
+            'davit_tiny.msft_in1k',
+            pretrained=True,
+            num_classes=0
+        )
+        self.model = model
+        return
+    
+
+    # Method: get_transforms
+    def get_transform(self):
+        def transform(image_path):
+            data_config = timm.data.resolve_model_data_config(self.model)
+            transforms = timm.data.create_transform(**data_config, is_training=False)
+            image = Image.open(image_path).convert('RGB')
+            image_trans = transforms(image)
+            return image_trans
+        return transform
+    
+
+    # Method: forward
+    def forward(self, input):
+        featureVec = self.model(input)
+        return featureVec
+
+
+
 # Dictionary: Models dictionary
 MODELS_DICT = {
+
+    # Image
     "Google_Base_Patch16_224":Google_Base_Patch16_224(),
     "DeiT_Base_Patch16_224":DeiT_Base_Patch16_224(),
     "Beit_Base_Patch16_224":Beit_Base_Patch16_224(),
@@ -551,6 +652,11 @@ MODELS_DICT = {
     "CrossViT_Tiny240":CrossViT_Tiny240(),
     "LeViTConv256":LeViTConv256(),
     "ConViT_Tiny":ConViT_Tiny(),
+    "MaxViT_Tiny_224":MaxViT_Tiny_224(),
+    "MViTv2_Tiny":MViTv2_Tiny(),
+    "DaViT_Tiny":DaViT_Tiny(),
+
+    # Multimodal
     "Google_Base_Patch16_224_MLP":Google_Base_Patch16_224_MLP(),
     "DinoV2_Base_Patch16_224_MLP":DinoV2_Base_Patch16_224_MLP(),
     "Beit_Base_Patch16_224_MLP":Beit_Base_Patch16_224_MLP(),
