@@ -509,7 +509,7 @@ class LeViT_256(nn.Module):
         featureVec = self.model(input)
         print(featureVec['logits'].shape, featureVec['cls_logits'].shape)
         print(featureVec['logits'], featureVec['cls_logits'])
-        return featureVec
+        return featureVec['logits']
 
 
 
