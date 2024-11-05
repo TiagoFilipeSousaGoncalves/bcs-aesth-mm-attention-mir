@@ -482,11 +482,13 @@ class LeViT_256(nn.Module):
     # Method: __init__
     def __init__(self):
         super(LeViT_256, self).__init__()
-        
+
         self.feature_extractor = LevitImageProcessor.from_pretrained('facebook/levit-256')
         self.model = LevitForImageClassificationWithTeacher.from_pretrained('facebook/levit-256')
-        self.model.classifier = nn.BatchNorm1d(num_features=512)
-        self.model.classifier_distill = nn.BatchNorm1d(num_features=512)
+
+        # Use an Indentity layer to get the last hidden states
+        self.model.classifier = nn.Identity()
+        self.model.classifier_distill = nn.Identity()
         print(self.model)
 
         return
