@@ -485,8 +485,8 @@ class LeViT_256(nn.Module):
         
         self.feature_extractor = LevitImageProcessor.from_pretrained('facebook/levit-256')
         self.model = LevitForImageClassificationWithTeacher.from_pretrained('facebook/levit-256')
-        self.model.classifier = nn.BatchNorm1d(num_features=512)
-        self.model.classifier_distill = nn.BatchNorm1d(num_features=512)
+        # self.model.classifier = nn.BatchNorm1d(num_features=512)
+        # self.model.classifier_distill = nn.BatchNorm1d(num_features=512)
         print(self.model)
 
         return
