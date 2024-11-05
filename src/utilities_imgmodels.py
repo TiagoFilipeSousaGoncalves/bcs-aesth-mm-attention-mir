@@ -20,7 +20,7 @@ from transformers import (
     BeitModel, 
     Dinov2Model,
     LevitForImageClassificationWithTeacher,
-    LevitFeatureExtractor
+    LevitImageProcessor
 )
 
 
@@ -483,7 +483,7 @@ class LeViT_256(nn.Module):
     def __init__(self):
         super(LeViT_256, self).__init__()
         
-        self.feature_extractor = LevitFeatureExtractor.from_pretrained('facebook/levit-256')
+        self.feature_extractor = LevitImageProcessor.from_pretrained('facebook/levit-256')
         self.model = LevitForImageClassificationWithTeacher.from_pretrained('facebook/levit-256')
         self.model.head = nn.Identity()
 
@@ -502,8 +502,8 @@ class LeViT_256(nn.Module):
 
     # Method: forward
     def forward(self, input):
-        # print(input.shape)
         featureVec = self.model(input)
+        print(featureVec)
         return featureVec
 
 
