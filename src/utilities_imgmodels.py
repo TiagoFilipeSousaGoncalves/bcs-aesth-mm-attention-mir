@@ -486,10 +486,10 @@ class LeViT_256(nn.Module):
         self.feature_extractor = LevitImageProcessor.from_pretrained('facebook/levit-256')
         self.model = LevitForImageClassificationWithTeacher.from_pretrained('facebook/levit-256')
 
-        # Use an Indentity layer to get the last hidden states
+        # Use an Indentity layer in the Classifier head(s) to get the last hidden states
         self.model.classifier = nn.Identity()
         self.model.classifier_distill = nn.Identity()
-        print(self.model)
+        # print(self.model)
 
         return
     
@@ -508,6 +508,7 @@ class LeViT_256(nn.Module):
     def forward(self, input):
         featureVec = self.model(input)
         print(featureVec['logits'].shape, featureVec['cls_logits'].shape)
+        print(featureVec['logits'], featureVec['cls_logits'])
         return featureVec
 
 
