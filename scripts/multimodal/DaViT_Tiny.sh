@@ -16,7 +16,7 @@ python src/main_multimodal.py \
  --images_original_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/E' \
- --img_model_weights_path '' \
+ --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E/2024-11-12_01-08-23/bin/model_final.pt' \
  --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E'
 echo "Finished"
 
@@ -28,6 +28,6 @@ python src/main_multimodal.py \
  --images_original_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/F' \
- --img_model_weights_path '' \
+ --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F/2024-11-12_06-20-13/bin/model_final.pt' \
  --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F'
 echo "Finished"
