@@ -16,7 +16,7 @@ from torch.nn import TripletMarginLoss
 # Project Imports
 from utilities_imgmodels import MODELS_DICT as models_dict
 from utilities_preproc import sample_manager
-from utilities_traintest import TripletDataset, train_triplets, save_model
+from utilities_traintest import TripletDataset, train_triplets
 
 # WandB Imports
 import wandb
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     num_epochs = config_json["num_epochs"]
 
     # Train Dataset & Dataloader
-    train_dataset = TripletDataset(images_resized_path, QNS_list_image_train, transform=model.get_transform())
+    train_dataset = TripletDataset(QNS_list=QNS_list_image_train, transform=model.get_transform())
     train_loader = DataLoader(
         dataset=train_dataset, 
         batch_size=batch_size, 
@@ -179,7 +179,7 @@ if __name__ == "__main__":
     )
 
     # Test Dataset & Dataloader
-    test_dataset = TripletDataset(images_resized_path, QNS_list_image_test, transform=model.get_transform())
+    test_dataset = TripletDataset(QNS_list=QNS_list_image_test, transform=model.get_transform())
     test_loader = DataLoader(
         dataset=test_dataset, 
         batch_size=batch_size, 
@@ -212,4 +212,4 @@ if __name__ == "__main__":
     # Save model
     if verbose:
         print(f'Saving {model_name}...')
-    save_model(model, os.path.join(path_save, "model_final.pt"))
+    torch.save(model.state_dict(), os.path.join(path_save, "model_final.pt"))

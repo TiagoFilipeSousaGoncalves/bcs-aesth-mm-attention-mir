@@ -1,8 +1,6 @@
 # Imports
-import sys
 import os
 import numpy as np
-from datetime import datetime
 from itertools import combinations
 
 # PyTorch Imports
@@ -18,11 +16,10 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 class TripletDataset(Dataset):
 
     # Method: __init__
-    def __init__(self, path, QNS_list, transform):
+    def __init__(self, QNS_list, transform):
 
         # Class variables
         self.transform = transform
-        self.path = path
 
         # Pre-compute all combination of the triplets
         self.triplets = []
@@ -189,8 +186,8 @@ def evaluate_triplets(model, data_loader, device):
 
 
 
-# Function: Evaluate models using nDCG metric
-def evaluate_ndcg(QNS_list, model, transform, device):
+# Function: Evaluate models using nDCG metric (not adjusted, deprecated)
+def _evaluate_ndcg(QNS_list, model, transform, device):
 
     # Create a list for the order of the retrieved images
     final_order = []
@@ -207,6 +204,7 @@ def evaluate_ndcg(QNS_list, model, transform, device):
             vec_ref = model(query_tensor)
 
             for neighbor_path in q_element.neighbor_vectors:
+
                 # Load and transform the neighbor image
                 neighbor_tensor = transform(neighbor_path).unsqueeze(0).to(device)
                 vec_i = model(neighbor_tensor)
@@ -216,6 +214,42 @@ def evaluate_ndcg(QNS_list, model, transform, device):
             final_order.append(fss) 
 
     model_acc = 100 * np.mean(test_ndcg(final_order))
+
+    return model_acc, final_order
+
+
+
+# Function: Evaluate models using nDCG metric (adjusted, current version)
+def evaluate_ndcg(QNS_list, model, transform, device):
+
+    final_order = []
+    rev_orders = []
+    model.eval()
+    
+    with torch.no_grad():
+        for q_element in QNS_list:
+            fss = []
+            rss = []
+
+            # Load and transform the query image
+            query_tensor = transform(q_element.query_vector).unsqueeze(0).to(device)
+            vec_ref = model(query_tensor)
+            count = 0
+            sz = len(q_element.neighbor_vectors)
+            
+            for neighbor_path in q_element.neighbor_vectors:
+                
+                # Load and transform the neighbor image
+                neighbor_tensor = transform(neighbor_path).unsqueeze(0).to(device)
+                vec_i = model(neighbor_tensor)
+                distf = torch.norm(vec_ref - vec_i)
+                fss.append(distf.item())
+                rss.append(sz-count)
+                count += 1
+            final_order.append(fss) 
+            rev_orders.append(rss)
+
+    model_acc = 100 * np.mean((test_ndcg(final_order) - test_ndcg(rev_orders))/(1 - test_ndcg(rev_orders)))
 
     return model_acc, final_order
 
@@ -238,43 +272,3 @@ def test_ndcg(distances):
     res[i]= dcg_aux/idcg_aux
 
   return res
-
-
-
-# Function: Save model
-def save_model(model, filepath):
-    """
-    Save the model's state dictionary to a file.
-
-    Args:
-    - model: The PyTorch model to save.
-    - filepath: The path where the model will be saved.
-    """
-    torch.save(model.state_dict(), filepath)
-    # print(f"Model saved to {filepath}")
-
-    return
-
-
-
-# Function: Load model
-def load_model(model, filepath, device):
-    """
-    Load the model's state dictionary from a file.
-
-    Args:
-    - model: The PyTorch model to load the state dictionary into.
-    - filepath: The path from where the model will be loaded.
-    - device: The device where the model should be loaded ('cpu' or 'cuda:0').
-
-    Returns:
-    - model: The loaded PyTorch model.
-    """
-    # Load the model's state dictionary
-    model.load_state_dict(torch.load(filepath, map_location=device))
-    # print(f"Model loaded from {filepath}")
-
-    # Set the model to evaluation mode
-    model.eval()
-
-    return model
