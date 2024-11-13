@@ -52,7 +52,7 @@ def set_seed(seed=10):
 if __name__ == "__main__":
 
     # CLI
-    parser = argparse.ArgumentParser(description='CINDERELLA BreLoAI Retrieval: Model Training, with image data.')
+    parser = argparse.ArgumentParser(description='CINDERELLA BreLoAI Retrieval: Model Training, with multi-modal data.')
     parser.add_argument('--gpu_id', type=int, default=0, help="The ID of the GPU we will use to run the program.")
     parser.add_argument('--config_json', type=str, default="config/config_image.json", help="The JSON configuration file.")
     parser.add_argument('--images_resized_path', type=str, required=True, help="The path to the resized images.")

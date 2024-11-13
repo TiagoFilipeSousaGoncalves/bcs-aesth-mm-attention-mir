@@ -1,5 +1,4 @@
 # Imports
-from urllib.request import urlopen
 from PIL import Image
 import timm
 
@@ -18,9 +17,7 @@ from transformers import (
     DeiTModel, 
     BeitImageProcessor, 
     BeitModel, 
-    Dinov2Model,
-    LevitForImageClassificationWithTeacher,
-    LevitImageProcessor
+    Dinov2Model
 )
 
 
