@@ -16,7 +16,8 @@ python src/main_image.py \
  --images_original_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/E' \
- --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E'
+ --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E' \
+ --train_or_test 'train'
 echo "Finished"
 
 echo "Catalogue Type: F"
@@ -27,5 +28,6 @@ python src/main_image.py \
  --images_original_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/F' \
- --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F'
+ --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F' \
+ --train_or_test 'train'
 echo "Finished"

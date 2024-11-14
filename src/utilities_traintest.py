@@ -61,7 +61,7 @@ class TripletDataset(Dataset):
 
 
 # Function: Train models using triplet loss
-def train_triplets(model, train_loader, test_loader, QNS_list_train, QNS_list_test, optimizer, criterion, num_epochs, device, path_save, wandb_run):
+def train_model(model, train_loader, test_loader, QNS_list_train, QNS_list_test, optimizer, criterion, num_epochs, device, path_save, wandb_run):
 
     # Alocate model to the device
     model.to(device)
@@ -124,9 +124,27 @@ def train_triplets(model, train_loader, test_loader, QNS_list_train, QNS_list_te
         # Save best model based on accuracy
         if test_acc > best_acc:
             best_acc = test_acc
-            torch.save(model.state_dict(), os.path.join(path_save, f"model_best_epoc{epoch}.pt"))
+            torch.save(model.state_dict(), os.path.join(path_save, f"model_best_epoch{epoch}.pt"))
+            torch.save(model.state_dict(), os.path.join(path_save, "model_final.pt"))
 
     return model, epoch_loss, epoch
+
+
+
+# Function: Evaluate model in inference phase 
+def eval_model(model, eval_loader, QNS_list_eval, device):
+
+    # Alocate model to the device
+    model.to(device)
+    model.eval()
+
+    # Compute accuracy
+    eval_acc  = evaluate_triplets(model, eval_loader, device)
+
+    # Compute nDCG
+    eval_ndcg = evaluate_ndcg(QNS_list_eval, model, transform=model.get_transform(), device=device)[0]
+
+    return eval_acc, eval_ndcg
 
 
 
