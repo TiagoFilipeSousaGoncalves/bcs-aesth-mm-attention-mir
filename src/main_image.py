@@ -222,6 +222,7 @@ if __name__ == "__main__":
             path_save=path_save,
             wandb_run=wandb_run
         )
+        wandb_run.finish()
     else:
         eval_acc, eval_ndcg = eval_model(
             model=model,
