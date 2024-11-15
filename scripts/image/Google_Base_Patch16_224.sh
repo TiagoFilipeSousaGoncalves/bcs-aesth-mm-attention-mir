@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=gpu_min12gb
-#SBATCH --qos=gpu_min12gb
+#SBATCH --partition=gpu_min32gb
+#SBATCH --qos=gpu_min32gb
 #SBATCH --job-name=cind_breloai_att_ret
 #SBATCH --output=Google_Base_Patch16_224.out
 #SBATCH --error=Google_Base_Patch16_224.err
