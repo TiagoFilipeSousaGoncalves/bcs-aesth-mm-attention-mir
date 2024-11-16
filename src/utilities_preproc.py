@@ -591,6 +591,64 @@ def get_query_neighbor_elements_path(catalogue_info_csv, catalogue_user_info_csv
 
 
 
+# Function: Get query neighbour elements from both image and tabular datasets
+def get_query_neighbor_elements_image_tabular(catalogue_info_csv, catalogue_user_info_csv, patient_info_csv, favorite_image_info_csv, patient_images_info_csv, catalogue_type='E', doctor_code=-1):
+
+    # Check if we want all catalogues or just a few
+    if doctor_code == -1:
+        queries_id, neighbours_id = get_catalogues_ids_from_csv(catalogue_info_csv, catalogue_type)
+    else:
+        queries_id, neighbours_id = get_catalogues_ids_per_doctor(catalogue_info_csv, catalogue_user_info_csv, catalogue_type, doctor_code)
+    
+    # Remove repetitive indexes
+    for idx, q in enumerate(queries_id):
+        for jdx, n in enumerate(neighbours_id[idx]):
+            if q == n:
+                neighbours_id[idx] = np.delete(neighbours_id[idx], jdx)
+
+    # Build QNS lists
+    QNS_img_list = list()
+    QNS_tab_list = list()
+    
+    for idx in range(len(queries_id)):
+        
+        # Image Data
+        qns_img_element = QNS_structure()
+        itm_img_q = get_pre_image_from_id(patient_info_csv, favorite_image_info_csv, patient_images_info_csv, queries_id[idx])
+
+        # Tabular Data
+        qns_tab_element = QNS_structure()
+        itm_tab_q = get_tabular_features_filtered_numpy(patient_info_csv, queries_id[idx]) 
+
+
+        if (itm_img_q is not None) and (itm_tab_q is not None):
+            qns_img_element.set_query_vector(itm_img_q, queries_id[idx])
+            qns_tab_element.set_query_vector(itm_tab_q, queries_id[idx])
+        
+            for jdx in range(len(neighbours_id[idx])):
+                
+                # Image Data
+                itm_img_n = get_pre_image_from_id(patient_info_csv, favorite_image_info_csv, patient_images_info_csv,neighbours_id[idx][jdx])
+                
+                # Tabular Data
+                itm_tab_n = get_tabular_features_filtered_numpy(patient_info_csv, neighbours_id[idx][jdx]) 
+
+                if (itm_img_n is not None) and (itm_tab_n is not None):
+                    qns_img_element.add_neighbor_vector(itm_img_n, neighbours_id[idx][jdx])
+                    qns_tab_element.add_neighbor_vector(itm_tab_n, neighbours_id[idx][jdx])
+
+            # Image Data
+            qns_img_element.calculate_expert_score()
+            QNS_img_list.append(qns_img_element)
+
+            # Tabular Data
+            qns_tab_element.calculate_expert_score()
+            QNS_tab_list.append(qns_tab_element)
+        
+    return QNS_img_list, len(QNS_img_list), QNS_tab_list, len(QNS_tab_list)
+
+
+
 # Function: Create a new name for the resized samples
 def edit_name_incase_using_resized(path, filename):
     basename = os.path.basename(filename)
@@ -672,8 +730,17 @@ def sample_manager(pickles_path):
 def data_preprocessing(images_resized_path, images_original_path, pickles_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, seed=10):
 
     # Get images and tabular data
-    QNS_image_list, QNS_image_count = get_query_neighbor_elements_path(catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info,catalogue_type=catalogue_type, doctor_code=doctor_code) # 39 57 36 -1
-    QNS_tabular_list, QNS_tabular_count = get_query_neighbor_elements(catalogue_info, catalogue_user_info, patient_info, doctor_code=doctor_code)
+    # QNS_image_list, QNS_image_count = get_query_neighbor_elements_path(catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info,catalogue_type=catalogue_type, doctor_code=doctor_code) # 39 57 36 -1
+    # QNS_tabular_list, QNS_tabular_count = get_query_neighbor_elements(catalogue_info, catalogue_user_info, patient_info, doctor_code=doctor_code)
+    QNS_image_list, QNS_image_count, QNS_tabular_list, QNS_tabular_count = get_query_neighbor_elements_image_tabular(
+        catalogue_info_csv=catalogue_info, 
+        catalogue_user_info_csv=catalogue_user_info, 
+        patient_info_csv=patient_info, 
+        favorite_image_info_csv=favorite_image_info, 
+        patient_images_info_csv=patient_images_info, 
+        catalogue_type=catalogue_type, 
+        doctor_code=doctor_code
+    )
 
     assert QNS_image_count == QNS_tabular_count, f'len(QNS_image_count):{QNS_image_count} != len(QNS_tabular_count):{QNS_tabular_count}'
 
