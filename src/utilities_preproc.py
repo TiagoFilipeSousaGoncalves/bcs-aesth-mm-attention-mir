@@ -620,7 +620,7 @@ def get_query_neighbor_elements_image_tabular(catalogue_info_csv, catalogue_user
         qns_tab_element = QNS_structure()
         itm_tab_q = get_tabular_features_filtered_numpy(patient_info_csv, queries_id[idx]) 
 
-
+        print(itm_img_q)
         if (itm_img_q is not None) and (itm_tab_q is not None) and os.path.exists(itm_img_q):
             qns_img_element.set_query_vector(itm_img_q, queries_id[idx])
             qns_tab_element.set_query_vector(itm_tab_q, queries_id[idx])
