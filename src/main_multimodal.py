@@ -158,8 +158,6 @@ if __name__ == "__main__":
     # catalogue_type = 'E'
     # doctor_code=-1 # 39 57 36 -1
 
-
-    # TODO: Work in Progress
     # Read dataset
     QNS_list_image_train, QNS_list_image_test, QNS_list_tabular_train, QNS_list_tabular_test = sample_manager(
         images_resized_path=images_resized_path,
@@ -174,11 +172,14 @@ if __name__ == "__main__":
         doctor_code=config_json["doctor_code"],
         split_ratio=config_json["split_ratio"]
     )
+    print(QNS_list_image_train)
+    print(QNS_list_image_test)
+    print(QNS_list_tabular_train)
+    print(QNS_list_tabular_test)
 
-    # TODO: Work in Progress
+
+
     # Create model, load model weights and activate evaluation mode
-    # model_name = "DinoV2_Base_Patch16_224"
-    # model_img_name = config_json["model_img_name"]
     model_img = models_img_dict[config_json["model_img_name"]]
     model_img.load_state_dict(torch.load(img_model_weights_path, map_location=device))
     model_img.to(device)
@@ -187,7 +188,6 @@ if __name__ == "__main__":
 
 
 
-    # TODO: Work in Progress
     # Save query image outputs - Train
     train_outs_query = []
     for qns in (QNS_list_image_train):
