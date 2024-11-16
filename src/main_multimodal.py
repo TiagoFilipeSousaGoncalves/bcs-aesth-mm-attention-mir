@@ -18,7 +18,7 @@ from utilities_imgmodels import MODELS_DICT as models_img_dict
 from utilities_preproc import sample_manager, QNS_structure
 from utilities_tabmodels import collaborative_tabular_normalize
 from utilities_tabmodels import MODELS_DICT as models_tab_dict
-from utilities_traintest import TripletDataset, train_triplets
+from utilities_traintest import TripletDataset, train_model
 
 # WandB Imports
 import wandb
@@ -373,8 +373,9 @@ if __name__ == "__main__":
              config_json["model_tab_name"], 
              ' (tabular).'
         )
-    model, _, _ = train_triplets(
-         model=model_tab, 
+
+    train_model(
+         model=model_tab,
          train_loader=train_loader, 
          test_loader=test_loader, 
          QNS_list_train=QNS_list_train_tab, 
@@ -384,24 +385,6 @@ if __name__ == "__main__":
          num_epochs=config_json["num_epochs"], 
          device=device, 
          path_save=path_save,
-         wandb_run=wandb_run
+         wandb_run=wandb_run  
     )
-
-    # Save model
-    if verbose:
-        print(
-             'Saving Multi-modal with ', 
-             config_json["model_img_name"], 
-             ' (image) and ', 
-             config_json["model_tab_name"], 
-             ' (tabular).'
-        )
-    torch.save(model.state_dict(), os.path.join(path_save, "model_final.pt"))
-
-
-
-
-    # TODO: Erase after testing
-    # print(f'Saving {model_name}...')
-    # save_model(model, f'{path_save}{model_name}/Finale.pl')
-    # print(f'Done {model_name}!')
+    wandb_run.finish()
