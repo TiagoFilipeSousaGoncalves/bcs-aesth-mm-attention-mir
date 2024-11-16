@@ -172,10 +172,6 @@ if __name__ == "__main__":
         doctor_code=config_json["doctor_code"],
         split_ratio=config_json["split_ratio"]
     )
-    print(len(QNS_list_image_train))
-    print(len(QNS_list_image_test))
-    print(len(QNS_list_tabular_train))
-    print(len(QNS_list_tabular_test))
 
 
 

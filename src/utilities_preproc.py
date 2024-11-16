@@ -8,6 +8,9 @@ import pickle
 from scipy.spatial.distance import euclidean
 from PIL import Image
 
+# Scikit-Learn Imports
+from sklearn.model_selection import train_test_split
+
 # PyTorch Imports
 import torch
 
@@ -540,7 +543,7 @@ def get_query_neighbor_elements(catalogue_info_csv, catalogue_user_info_csv, pat
         qns_element.set_query_vector(itm, queries_id[idx])
         
         for jdx in range(len(neighbours_id[idx])): 
-            #itm = get_tabular_features_filtered(patient_info_csv, neighbours_id[idx][jdx]) 
+            # itm = get_tabular_features_filtered(patient_info_csv, neighbours_id[idx][jdx]) 
             itm = get_tabular_features_filtered_numpy(patient_info_csv, neighbours_id[idx][jdx]) 
             if itm is None:
                 continue
@@ -641,102 +644,88 @@ def collaborative_tabular_normalize(qns_list, min_max_values=None):
 
 
 # Function: Sample manager
-def sample_manager(images_resized_path, images_original_path, pickles_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, force_create_pickles=False):
+def sample_manager(pickles_path):
 
-    # Create pickles to speed-up training, if needed
-    create_pickles = None
-    if os.path.exists(os.path.join(pickles_path, 'image_train.pkl'))\
+    # Assert that these paths exist
+    assert os.path.exists(os.path.join(pickles_path, 'image_train.pkl'))\
           and os.path.exists(os.path.join(pickles_path, 'image_test.pkl'))\
               and os.path.exists(os.path.join(pickles_path, 'tabular_train.pkl'))\
-                  and os.path.exists(os.path.join(pickles_path, 'tabular_test.pkl')):
-        create_pickles = False
-    else:
-        create_pickles = True
+                  and os.path.exists(os.path.join(pickles_path, 'tabular_test.pkl'))
 
-    if create_pickles or force_create_pickles:
-        # print('Reading Samples...')
-        QNS_image_list, QNS_image_count = get_query_neighbor_elements_path(catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info,catalogue_type=catalogue_type, doctor_code=doctor_code) # 39 57 36 -1
+    # Open files
+    with open(os.path.join(pickles_path, 'image_train.pkl'), 'rb') as file:
+        QNS_image_list_train = pickle.load(file)
+    with open(os.path.join(pickles_path, 'image_test.pkl'), 'rb') as file:
+        QNS_image_list_test = pickle.load(file)
+    
+    with open(os.path.join(pickles_path, 'tabular_train.pkl'), 'rb') as file:
+        QNS_tabular_list_train = pickle.load(file)
+    with open(os.path.join(pickles_path, 'tabular_test.pkl'), 'rb') as file:
+        QNS_tabular_list_test = pickle.load(file)
 
-        QNS_tabular_list, QNS_tabular_count = get_query_neighbor_elements(catalogue_info, catalogue_user_info, patient_info, doctor_code=doctor_code)
 
-        # In-case print to check
-        # for q in QNS_image_list:
-        #     q.show_summary()
-        # print("\n\n***************************\n\n")
-        # for q in QNS_tabular_list:
-        #     q.show_summary()
-        
-        # print('Shuffling Samples...')
-        np.random.shuffle(QNS_image_list)
-        np.random.shuffle(QNS_tabular_list)
+    return QNS_image_list_train, QNS_image_list_test, QNS_tabular_list_train, QNS_tabular_list_test
 
-        # print('Modifying File Addressing')
-        for QNS_element in QNS_image_list:
-            original_path = QNS_element.query_vector
+
+
+# Function: Data preprocessing
+def data_preprocessing(images_resized_path, images_original_path, pickles_path, catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info, catalogue_type='E', doctor_code=-1, split_ratio=0.8, seed=10):
+
+    # Get images and tabular data
+    QNS_image_list, QNS_image_count = get_query_neighbor_elements_path(catalogue_info, catalogue_user_info, patient_info, favorite_image_info, patient_images_info,catalogue_type=catalogue_type, doctor_code=doctor_code) # 39 57 36 -1
+    QNS_tabular_list, QNS_tabular_count = get_query_neighbor_elements(catalogue_info, catalogue_user_info, patient_info, doctor_code=doctor_code)
+
+    assert QNS_image_count == QNS_tabular_count, f'len(QNS_image_count):{QNS_image_count} != len(QNS_tabular_count):{QNS_tabular_count}'
+
+    # print('Modifying File Addressing')
+    for QNS_element in QNS_image_list:
+        original_path = QNS_element.query_vector
+        resized_path = edit_name_incase_using_resized(
+            path=images_resized_path, 
+            filename=QNS_element.query_vector
+        )
+        resize_image(
+            input_path=os.path.join(images_original_path, original_path),
+            output_path=resized_path,
+            size=(224, 224)
+        )
+        QNS_element.query_vector = resized_path
+
+        for j in range(QNS_element.neighbor_count):
             resized_path = edit_name_incase_using_resized(
                 path=images_resized_path, 
-                filename=QNS_element.query_vector
+                filename=QNS_element.neighbor_vectors[j]
             )
             resize_image(
-                input_path=os.path.join(images_original_path, original_path),
+                input_path=os.path.join(images_original_path, QNS_element.neighbor_vectors[j]),
                 output_path=resized_path,
                 size=(224, 224)
             )
-            QNS_element.query_vector = resized_path
+            QNS_element.neighbor_vectors[j] = resized_path
 
-            for j in range(0, QNS_element.neighbor_count):
-                resized_path = edit_name_incase_using_resized(
-                    path=images_resized_path, 
-                    filename=QNS_element.neighbor_vectors[j]
-                )
-                resize_image(
-                    input_path=os.path.join(images_original_path, QNS_element.neighbor_vectors[j]),
-                    output_path=resized_path,
-                    size=(224, 224)
-                )
-                QNS_element.neighbor_vectors[j] = resized_path
 
-        # print('Train-Test Split...')
-        QNS_image_list_train = QNS_image_list[:int(np.floor(split_ratio * QNS_image_count))]
-        QNS_image_list_test  = QNS_image_list[int(np.floor(split_ratio * QNS_image_count)):]
+    # Perform train-test split
+    QNS_image_list_train, QNS_image_list_test, QNS_tabular_list_train, QNS_tabular_list_test = train_test_split(QNS_image_list, QNS_tabular_list, train_size=split_ratio, random_state=seed)
 
-        QNS_tabular_list_train = QNS_tabular_list[:int(np.floor(split_ratio * QNS_tabular_count))]
-        QNS_tabular_list_test  = QNS_tabular_list[int(np.floor(split_ratio * QNS_tabular_count)):]
 
-        # print('Saving QNS...')
-        with open(os.path.join(pickles_path, 'image_train.pkl'), 'wb') as file:
-            pickle.dump(QNS_image_list_train, file, protocol=pickle.DEFAULT_PROTOCOL)
-        with open(os.path.join(pickles_path, 'image_test.pkl'), 'wb') as file:
-            pickle.dump(QNS_image_list_test, file, protocol=pickle.DEFAULT_PROTOCOL)
+    # QNS_image_list_train = QNS_image_list[:int(np.floor(split_ratio * QNS_image_count))]
+    # QNS_image_list_test  = QNS_image_list[int(np.floor(split_ratio * QNS_image_count)):]
 
-        with open(os.path.join(pickles_path, 'tabular_train.pkl'), 'wb') as file:
-            pickle.dump(QNS_tabular_list_train, file, protocol=pickle.DEFAULT_PROTOCOL)
-        with open(os.path.join(pickles_path, 'tabular_test.pkl'), 'wb') as file:
-            pickle.dump(QNS_tabular_list_test, file, protocol=pickle.DEFAULT_PROTOCOL)
+    # QNS_tabular_list_train = QNS_tabular_list[:int(np.floor(split_ratio * QNS_tabular_count))]
+    # QNS_tabular_list_test  = QNS_tabular_list[int(np.floor(split_ratio * QNS_tabular_count)):]
 
-    else:   
-        # print('Loading QNS...')
-        # Load the KMeans model from the file
-        with open(os.path.join(pickles_path, 'image_train.pkl'), 'rb') as file:
-            QNS_image_list_train = pickle.load(file)
-        with open(os.path.join(pickles_path, 'image_test.pkl'), 'rb') as file:
-            QNS_image_list_test = pickle.load(file)
-        
-        with open(os.path.join(pickles_path, 'tabular_train.pkl'), 'rb') as file:
-            QNS_tabular_list_train = pickle.load(file)
-        with open(os.path.join(pickles_path, 'tabular_test.pkl'), 'rb') as file:
-            QNS_tabular_list_test = pickle.load(file)
+    # Save these into pickle files
+    with open(os.path.join(pickles_path, 'image_train.pkl'), 'wb') as file:
+        pickle.dump(QNS_image_list_train, file, protocol=pickle.DEFAULT_PROTOCOL)
+    with open(os.path.join(pickles_path, 'image_test.pkl'), 'wb') as file:
+        pickle.dump(QNS_image_list_test, file, protocol=pickle.DEFAULT_PROTOCOL)
 
-    # min_max_values = collaborative_tabular_normalize(QNS_tabular_list_train)
-    # collaborative_tabular_normalize(QNS_tabular_list_test, min_max_values)
+    with open(os.path.join(pickles_path, 'tabular_train.pkl'), 'wb') as file:
+        pickle.dump(QNS_tabular_list_train, file, protocol=pickle.DEFAULT_PROTOCOL)
+    with open(os.path.join(pickles_path, 'tabular_test.pkl'), 'wb') as file:
+        pickle.dump(QNS_tabular_list_test, file, protocol=pickle.DEFAULT_PROTOCOL)
 
-    # for q in QNS_tabular_list_train:
-    #     q.show_summary(str=False)
-
-    # for q in QNS_tabular_list_test:
-    #     q.show_summary(str=False)
-
-    return QNS_image_list_train, QNS_image_list_test, QNS_tabular_list_train, QNS_tabular_list_test
+    return
 
 
 
