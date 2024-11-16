@@ -138,25 +138,6 @@ if __name__ == "__main__":
     assert wandb_run is wandb.run
 
 
-    # TODO: Delete after testing    
-    # Required Paths
-    # current_directory = os.getcwd()
-    # images_path='/nas-ctm01/datasets/private/CINDERELLA/breloai-rsz-v2/'
-    # csvs_path =current_directory+'/csvs/'
-    # favorite_image_info = csvs_path + 'favorite_image_info.csv'
-    # patient_info = csvs_path + 'patient_info.csv'
-    # patient_images_info = csvs_path + 'patient_images.csv'
-    # catalogue_info = csvs_path + 'catalogue_info.csv'
-    # catalogue_user_info = csvs_path + 'catalogue_user_info.csv'
-    # train_pickle_path = current_directory + '/pickles_clean/qns_list_train_img_2.pkl'
-    # test_pickle_path  = current_directory + '/pickles_clean/qns_list_test_img_2.pkl'
-    # train_pickle_path_tab = current_directory + '/pickles_clean/qns_list_train_tab_2.pkl'
-    # test_pickle_path_tab  = current_directory + '/pickles_clean/qns_list_test_tab_2.pkl'
-    # path_save = current_directory + '/bin_clean/'
-
-    # split_ratio=0.8
-    # catalogue_type = 'E'
-    # doctor_code=-1 # 39 57 36 -1
 
     # Read dataset
     QNS_list_image_train, QNS_list_image_test, QNS_list_tabular_train, QNS_list_tabular_test = sample_manager(pickles_path=pickles_path)
@@ -260,14 +241,6 @@ if __name__ == "__main__":
 
 
 
-    # TODO: Erase after testing
-    # with open(train_pickle_path_tab, 'rb') as file:
-    #             QNS_list_train_t = pickle.load(file)
-    # with open(test_pickle_path_tab, 'rb') as file:
-    #             QNS_list_test_t = pickle.load(file)
-
-
-
     # Create a new QNS for MultiModal
     # Train
     QNS_list_train_tab = []
@@ -308,19 +281,6 @@ if __name__ == "__main__":
         count += 1
 
 
-    # print('Starting...')
-    # Configs
-    # np.random.seed(10)
-    # torch.manual_seed(10)
-
-    # lr=0.0001
-    # num_epochs=200
-    # batch_size=512
-    # margin = 0.0001
-    # split_ratio=0.8
-    # catalogue_type = 'E'
-    # doctor_code=-1 # 39 57 36 -1
-
 
     # Use Train QNS to obtain the Min/Max values for collaborative tabular normalization
     min_max_values = collaborative_tabular_normalize(QNS_list_train_tab)
@@ -332,14 +292,7 @@ if __name__ == "__main__":
 
 
 
-    # TODO: WIP
-    # path_save = current_directory + '/bin_MultiModal_v2/'
-
-
     # Get Tabular model
-    # models = {
-    #     "TabularMLP_773_300_20": TabularMLP(773, 200, 20 )
-    # }
     model_tab = models_tab_dict[config_json["model_tab_name"]]
 
     # Define Dataset & Dataloaders & Optimization Parameters

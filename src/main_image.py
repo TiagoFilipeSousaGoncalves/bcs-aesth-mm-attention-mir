@@ -148,19 +148,7 @@ if __name__ == "__main__":
 
 
     # Preprocessing
-    QNS_list_image_train, QNS_list_image_test, QNS_list_tabular_train, QNS_list_tabular_test = sample_manager(
-        images_resized_path=images_resized_path,
-        images_original_path=images_original_path,
-        pickles_path=pickles_path,
-        catalogue_info=catalogue_info,
-        catalogue_user_info=catalogue_user_info,
-        patient_info=patient_info,
-        favorite_image_info=favorite_image_info,
-        patient_images_info=patient_images_info,
-        catalogue_type=config_json["catalogue_type"],
-        doctor_code=config_json["doctor_code"],
-        split_ratio=config_json["split_ratio"]
-    )
+    QNS_list_image_train, QNS_list_image_test, QNS_list_tabular_train, QNS_list_tabular_test = sample_manager(pickles_path=pickles_path)
 
 
 
