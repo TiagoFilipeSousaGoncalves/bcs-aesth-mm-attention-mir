@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=gpu_min80gb
-#SBATCH --qos=gpu_min80gb
+#SBATCH --partition=gpu_min32gb
+#SBATCH --qos=gpu_min32gb
 #SBATCH --job-name=cind_breloai_att_ret
 #SBATCH --output=DeiT_Base_Patch16_224.out
 #SBATCH --error=DeiT_Base_Patch16_224.err
