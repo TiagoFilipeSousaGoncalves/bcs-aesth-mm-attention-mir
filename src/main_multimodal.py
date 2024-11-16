@@ -203,17 +203,18 @@ if __name__ == "__main__":
             
             query_input = query_input.to(device)
             query_out = model_img(query_input)
-            query_out = query_out.to('cpu')
-            query_out = query_out.detach().numpy()
+            query_out = query_out.cpu().detach().numpy()
+            # query_out = query_out.detach().numpy()
             train_outs_query.append(query_out[0])
 
     # Save neighbour image outputs - Train
     train_outs_rtr = []
-    for qns in (QNS_list_image_train):
+    for qns in QNS_list_image_train:
             aux = []
             rtr_vectors = qns.neighbor_vectors
             for z in range(len(rtr_vectors)):
                 rtr_input = transform(rtr_vectors[z])
+                
                 # Ensure the query input is a tensor and has the correct shape
                 if isinstance(rtr_input, np.ndarray):
                     rtr_input = torch.tensor(rtr_input)
@@ -224,8 +225,8 @@ if __name__ == "__main__":
                 
                 rtr_input = rtr_input.to(device)
                 rtr_input = model_img(rtr_input)
-                rtr_input = rtr_input.to('cpu')
-                rtr_input = rtr_input.detach().numpy()
+                rtr_input = rtr_input.cpu().detach().numpy()
+                # rtr_input = rtr_input.detach().numpy()
 
                 aux.append(rtr_input[0])
             train_outs_rtr.append(aux)
@@ -246,13 +247,13 @@ if __name__ == "__main__":
             
             query_input = query_input.to(device)
             query_out = model_img(query_input)
-            query_out = query_out.to('cpu')
-            query_out = query_out.detach().numpy()
+            query_out = query_out.cpu().detach().numpy()
+            # query_out = query_out.detach().numpy()
             test_outs_query.append(query_out[0])
 
     # Save neighbour image outputs - Test
     test_outs_rtr = []
-    for qns in (QNS_list_image_test):
+    for qns in QNS_list_image_test:
             aux =[]
             rtr_vectors = qns.neighbor_vectors
             for z in range(len(rtr_vectors)):
@@ -267,8 +268,8 @@ if __name__ == "__main__":
                 
                 rtr_input = rtr_input.to(device)
                 rtr_input = model_img(rtr_input)
-                rtr_input = rtr_input.to('cpu')
-                rtr_input = rtr_input.detach().numpy()
+                rtr_input = rtr_input.cpu().detach().numpy()
+                # rtr_input = rtr_input.detach().numpy()
 
                 aux.append(rtr_input[0])
             test_outs_rtr.append(aux)
@@ -287,16 +288,16 @@ if __name__ == "__main__":
     # Train
     QNS_list_train_tab = []
     count = 0
-    for qns in (QNS_list_tabular_train): 
+    for qns in QNS_list_tabular_train: 
         qns_element = QNS_structure()
         itm = qns.query_vector
-        id = qns.query_vector_id
-        itm = np.append(itm,train_outs_query[count])
+        # id = qns.query_vector_id
+        itm = np.append(itm, train_outs_query[count])
         qns_element.set_query_vector(itm, qns.query_vector_id)
 
         for jdx in range(len(qns.neighbor_vectors_id)): 
             itm = qns.neighbor_vectors[jdx]
-            id = qns.neighbor_vectors_id[jdx]
+            # id = qns.neighbor_vectors_id[jdx]
             itm = np.append(itm,train_outs_rtr[count][jdx])
             qns_element.add_neighbor_vector(itm, qns.neighbor_vectors_id[jdx])
         qns_element.calculate_expert_score()
@@ -306,16 +307,16 @@ if __name__ == "__main__":
     # Test
     QNS_list_test_tab = []
     count = 0
-    for qns in (QNS_list_tabular_test): 
+    for qns in QNS_list_tabular_test:
         qns_element = QNS_structure()
         itm = qns.query_vector
-        id = qns.query_vector_id
+        # id = qns.query_vector_id
         itm = np.append(itm,test_outs_query[count])
         qns_element.set_query_vector(itm, qns.query_vector_id)
 
         for jdx in range(len(qns.neighbor_vectors_id)): 
             itm = qns.neighbor_vectors[jdx]
-            id = qns.neighbor_vectors_id[jdx]
+            # id = qns.neighbor_vectors_id[jdx]
             itm = np.append(itm,test_outs_rtr[count][jdx])
             qns_element.add_neighbor_vector(itm, qns.neighbor_vectors_id[jdx])
         qns_element.calculate_expert_score()
