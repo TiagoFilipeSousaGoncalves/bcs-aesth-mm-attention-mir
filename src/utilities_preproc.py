@@ -741,7 +741,7 @@ def data_preprocessing(images_resized_path, images_original_path, pickles_path, 
         catalogue_type=catalogue_type, 
         doctor_code=doctor_code
     )
-
+    print(QNS_image_count, QNS_tabular_count)
     assert QNS_image_count == QNS_tabular_count, f'len(QNS_image_count):{QNS_image_count} != len(QNS_tabular_count):{QNS_tabular_count}'
 
     # print('Modifying File Addressing')
