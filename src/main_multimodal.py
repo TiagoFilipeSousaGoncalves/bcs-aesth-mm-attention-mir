@@ -172,10 +172,10 @@ if __name__ == "__main__":
         doctor_code=config_json["doctor_code"],
         split_ratio=config_json["split_ratio"]
     )
-    print(QNS_list_image_train)
-    print(QNS_list_image_test)
-    print(QNS_list_tabular_train)
-    print(QNS_list_tabular_test)
+    print(len(QNS_list_image_train))
+    print(len(QNS_list_image_test))
+    print(len(QNS_list_tabular_train))
+    print(len(QNS_list_tabular_test))
 
 
 
@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
     # Save query image outputs - Train
     train_outs_query = []
-    for qns in (QNS_list_image_train):
+    for qns in QNS_list_image_train:
             query = qns.query_vector
             query_input = transform(query)
 
@@ -234,7 +234,7 @@ if __name__ == "__main__":
 
     # Save query image outputs - Test
     test_outs_query = []
-    for qns in (QNS_list_image_test):
+    for qns in QNS_list_image_test:
             query = qns.query_vector
             transform = model_img.get_transform()
             query_input = transform(query)
