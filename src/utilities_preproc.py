@@ -592,7 +592,7 @@ def get_query_neighbor_elements_path(catalogue_info_csv, catalogue_user_info_csv
 
 
 # Function: Get query neighbour elements from both image and tabular datasets
-def get_query_neighbor_elements_image_tabular(catalogue_info_csv, catalogue_user_info_csv, patient_info_csv, favorite_image_info_csv, patient_images_info_csv, catalogue_type='E', doctor_code=-1):
+def get_query_neighbor_elements_image_tabular(catalogue_info_csv, catalogue_user_info_csv, patient_info_csv, favorite_image_info_csv, patient_images_info_csv, images_original_path, catalogue_type='E', doctor_code=-1):
 
     # Check if we want all catalogues or just a few
     if doctor_code == -1:
@@ -620,8 +620,7 @@ def get_query_neighbor_elements_image_tabular(catalogue_info_csv, catalogue_user
         qns_tab_element = QNS_structure()
         itm_tab_q = get_tabular_features_filtered_numpy(patient_info_csv, queries_id[idx]) 
 
-        print(itm_img_q)
-        if (itm_img_q is not None) and (itm_tab_q is not None) and os.path.exists(itm_img_q):
+        if (itm_img_q is not None) and (itm_tab_q is not None) and os.path.exists(os.path.join(images_original_path, itm_img_q)):
             qns_img_element.set_query_vector(itm_img_q, queries_id[idx])
             qns_tab_element.set_query_vector(itm_tab_q, queries_id[idx])
         
@@ -737,7 +736,8 @@ def data_preprocessing(images_resized_path, images_original_path, pickles_path, 
         catalogue_user_info_csv=catalogue_user_info, 
         patient_info_csv=patient_info, 
         favorite_image_info_csv=favorite_image_info, 
-        patient_images_info_csv=patient_images_info, 
+        patient_images_info_csv=patient_images_info,
+        images_original_path=images_original_path,
         catalogue_type=catalogue_type, 
         doctor_code=doctor_code
     )
