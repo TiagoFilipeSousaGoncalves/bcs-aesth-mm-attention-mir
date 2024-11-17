@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=gpu_min80gb
-#SBATCH --qos=gpu_min80gb
+#SBATCH --partition=gpu_min12gb
+#SBATCH --qos=gpu_min12gb
 #SBATCH --job-name=cind_breloai_att_ret
 #SBATCH --output=MViTv2_Tiny.out
 #SBATCH --error=MViTv2_Tiny.err
