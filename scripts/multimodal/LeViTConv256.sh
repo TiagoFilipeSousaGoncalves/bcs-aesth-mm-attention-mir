@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=gpu_min24gb
-#SBATCH --qos=gpu_min24gb
+#SBATCH --partition=gpu_min32gb
+#SBATCH --qos=gpu_min32gb
 #SBATCH --job-name=cind_breloai_att_ret
 #SBATCH --output=LeViTConv256.out
 #SBATCH --error=LeViTConv256.err
@@ -14,7 +14,7 @@ python src/main_multimodal.py \
  --config_json 'config/multimodal/E/LeViTConv256.json' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/E' \
- --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E/2024-11-12_09-24-32/bin/model_final.pt' \
+ --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E/2024-11-17_12-50-01/bin/model_final.pt' \
  --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E'
 echo "Finished"
 
@@ -24,6 +24,6 @@ python src/main_multimodal.py \
  --config_json 'config/multimodal/F/LeViTConv256.json' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/F' \
- --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F/2024-11-12_13-33-15/bin/model_final.pt' \
+ --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F/2024-11-17_15-53-41/bin/model_final.pt' \
  --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F'
 echo "Finished"
