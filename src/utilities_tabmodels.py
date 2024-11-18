@@ -53,6 +53,7 @@ class TabularMLP(nn.Module):
 # Dictionary: Models dictionary
 MODELS_DICT = {
     "TabularMLP_773_200_20": TabularMLP(773, 200, 20),
+    "TabularMLP_293_100_20":TabularMLP(293, 100, 20),
     "TabularMLP_197_100_20":TabularMLP(197, 100, 20)
 }
 
