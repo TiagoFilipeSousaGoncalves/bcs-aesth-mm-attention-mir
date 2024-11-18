@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=gpu_min12gb
-#SBATCH --qos=gpu_min12gb
+#SBATCH --partition=gpu_min24gb
+#SBATCH --qos=gpu_min24gb
 #SBATCH --job-name=cind_breloai_att_ret
 #SBATCH --output=CrossViT_Tiny240.out
 #SBATCH --error=CrossViT_Tiny240.err
@@ -14,7 +14,7 @@ python src/main_multimodal.py \
  --config_json 'config/multimodal/E/CrossViT_Tiny240.json' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/E' \
- --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E/2024-11-12_01-07-16/bin/model_final.pt' \
+ --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E/2024-11-16_22-19-53/bin/model_final.pt' \
  --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E'
 echo "Finished"
 
@@ -24,6 +24,6 @@ python src/main_multimodal.py \
  --config_json 'config/multimodal/F/CrossViT_Tiny240.json' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/F' \
- --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F/2024-11-12_04-11-12/bin/model_final.pt' \
+ --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F/2024-11-17_01-29-49/bin/model_final.pt' \
  --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F'
 echo "Finished"
