@@ -199,6 +199,7 @@ if __name__ == "__main__":
         )
         wandb_run.finish()
     else:
+        model.load_state_dict(torch.load(os.path.join(path_save, "model_final.pt"), map_location=device))
         train_acc, train_ndcg = eval_model(
             model=model,
             eval_loader=train_loader,
