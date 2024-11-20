@@ -6,6 +6,7 @@ import datetime
 import random
 import json
 import shutil
+import pandas as pd
 
 # PyTorch Imports
 import torch
@@ -52,12 +53,9 @@ if __name__ == "__main__":
     # CLI
     parser = argparse.ArgumentParser(description='CINDERELLA BreLoAI Retrieval: Model Training, with image data.')
     parser.add_argument('--gpu_id', type=int, default=0, help="The ID of the GPU we will use to run the program.")
-    parser.add_argument('--config_json', type=str, default="config/config_image.json", help="The JSON configuration file.")
-    parser.add_argument('--images_resized_path', type=str, required=True, help="The path to the resized images.")
-    parser.add_argument('--images_original_path', type=str, required=True, help="The path to the original images.")
-    parser.add_argument('--csvs_path', type=str, required=True, help="The path to the CSVs with metadata.")
+    parser.add_argument('--config_json', type=str, required=False, default="config/config_image.json", help="The JSON configuration file.")
     parser.add_argument('--pickles_path', type=str, required=True, help="The path to the pickle files (to speed up training).")
-    parser.add_argument('--results_path', type=str, required=True, help="The path to save the results.")
+    parser.add_argument('--results_path', type=str, required=False, help="The path to save the results.")
     parser.add_argument('--train_or_test', type=str, required=False, choices=["train", "test"], default="train", help="The execution setting: train or test.")
     parser.add_argument('--checkpoint_path', type=str, required=False, help="The path to the model checkpoints.")
     parser.add_argument('--verbose', action='store_true', default=False, help="Verbose.")
@@ -73,22 +71,11 @@ if __name__ == "__main__":
     # Get arguments
     gpu_id = args.gpu_id
     config_json_ = args.config_json
-    images_resized_path = args.images_resized_path
-    images_original_path = args.images_original_path
-    csvs_path = args.csvs_path
     pickles_path = args.pickles_path
     results_path = args.results_path
     train_or_test = args.train_or_test
     checkpoint_path = args.checkpoint_path
     verbose = args.verbose
-
-    # Build paths
-    favorite_image_info = os.path.join(csvs_path, 'favorite_image_info.csv')
-    patient_info = os.path.join(csvs_path, 'patient_info.csv')
-    patient_images_info = os.path.join(csvs_path, 'patient_images.csv')
-    catalogue_info = os.path.join(csvs_path, 'catalogue_info.csv')
-    catalogue_user_info = os.path.join(csvs_path, 'catalogue_user_info.csv')
-
 
     # If train
     if train_or_test == "train":
@@ -97,7 +84,7 @@ if __name__ == "__main__":
 
         for path in [experiment_results_path, pickles_path, path_save]:
             os.makedirs(path, exist_ok=True)
-        
+
         # Open configuration JSON
         with open(config_json_, 'r') as j:
             config_json = json.load(j)
@@ -212,9 +199,25 @@ if __name__ == "__main__":
         )
         wandb_run.finish()
     else:
-        eval_acc, eval_ndcg = eval_model(
+        train_acc, train_ndcg = eval_model(
             model=model,
-            eval_loader=test_loader,
-            QNS_list_eval=QNS_list_tabular_test,
+            eval_loader=train_loader,
+            QNS_list_eval=QNS_list_image_train,
             device=device
         )
+        test_acc, test_ndcg = eval_model(
+            model=model,
+            eval_loader=test_loader,
+            QNS_list_eval=QNS_list_image_test,
+            device=device
+        )
+        results_dict = {
+             "train_acc":[train_acc], 
+             "train_ndcg":[train_ndcg],
+            "test_acc":[test_acc],
+            "test_ndcg":[test_ndcg]
+        }
+        eval_df = pd.DataFrame.from_dict(results_dict)
+        if verbose:
+            print(eval_df)
+        eval_df.to_csv(os.path.join(checkpoint_path, "eval_results.csv"))
