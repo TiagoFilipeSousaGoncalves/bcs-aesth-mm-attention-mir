@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=gpu_min32gb
-#SBATCH --qos=gpu_min32gb
+#SBATCH --partition=gpu_min12gb
+#SBATCH --qos=gpu_min12gb
 #SBATCH --job-name=cind_breloai_att_ret
 #SBATCH --output=DaViT_Tiny.out
 #SBATCH --error=DaViT_Tiny.err
