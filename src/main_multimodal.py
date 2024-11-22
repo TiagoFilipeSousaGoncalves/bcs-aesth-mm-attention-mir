@@ -341,13 +341,13 @@ if __name__ == "__main__":
         train_acc, train_ndcg = eval_model(
             model=model_tab,
             eval_loader=train_loader,
-            QNS_list_eval=QNS_list_image_train,
+            QNS_list_eval=QNS_list_train_tab,
             device=device
         )
         test_acc, test_ndcg = eval_model(
             model=model_tab,
             eval_loader=test_loader,
-            QNS_list_eval=QNS_list_image_test,
+            QNS_list_eval=QNS_list_test_tab,
             device=device
         )
         results_dict = {
