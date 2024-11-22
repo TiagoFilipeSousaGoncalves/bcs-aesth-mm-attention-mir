@@ -8,5 +8,5 @@
     "catalogue_type":"F",
     "doctor_code":-1,
     "model_img_name":"Beit_Base_Patch16_224",
-    "model_tab_name":"TabularMLP_773_300_20"
+    "model_tab_name":"TabularMLP_773_200_20"
 }
