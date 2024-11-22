@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --partition=gpu_min12gb
-#SBATCH --qos=gpu_min12gb
+#SBATCH --partition=gpu_min24gb
+#SBATCH --qos=gpu_min24gb
 #SBATCH --job-name=cind_breloai_att_ret
 #SBATCH --output=DeiT_Base_Patch16_224.out
 #SBATCH --error=DeiT_Base_Patch16_224.err
@@ -8,22 +8,42 @@
 
 
 echo "CINDERELLA BreLoAI Retrieval: A Study with Attention Mechanisms"
-echo "Catalogue Type: E"
+# echo "Training Catalogue Type: E"
+# python src/main_multimodal.py \
+#  --gpu_id 0 \
+#  --config_json 'config/multimodal/E/DeiT_Base_Patch16_224.json' \
+#  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
+#  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/E' \
+#  --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E/2024-11-17_04-23-52/bin/model_final.pt' \
+#  --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E'
+# echo "Finished"
+echo "Testing Catalogue Type: E"
 python src/main_multimodal.py \
  --gpu_id 0 \
- --config_json 'config/multimodal/E/DeiT_Base_Patch16_224.json' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/E' \
  --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E/2024-11-17_04-23-52/bin/model_final.pt' \
- --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E'
+ --checkpoint_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/E/2024-11-18_08-47-20/' \
+ --train_or_test 'test' \
+ --verbose
 echo "Finished"
 
-echo "Catalogue Type: F"
+# echo "Training Catalogue Type: F"
+# python src/main_multimodal.py \
+#  --gpu_id 0 \
+#  --config_json 'config/multimodal/F/DeiT_Base_Patch16_224.json' \
+#  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
+#  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/F' \
+#  --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F/2024-11-17_10-17-31/bin/model_final.pt' \
+#  --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F'
+# echo "Finished"
+echo "Testing Catalogue Type: F"
 python src/main_multimodal.py \
  --gpu_id 0 \
- --config_json 'config/multimodal/F/DeiT_Base_Patch16_224.json' \
  --csvs_path '/nas-ctm01/datasets/private/CINDERELLA/breloai-web-db/csvs' \
  --pickles_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/pickles/F' \
  --img_model_weights_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F/2024-11-17_10-17-31/bin/model_final.pt' \
- --results_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F'
+ --checkpoint_path '/nas-ctm01/datasets/private/CINDERELLA/experiments/retrieval/tgoncalv/results/F/2024-11-18_08-54-25/' \
+ --train_or_test 'test' \
+ --verbose
 echo "Finished"
