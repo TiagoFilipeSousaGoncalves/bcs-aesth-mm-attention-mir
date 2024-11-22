@@ -6,6 +6,7 @@ import numpy as np
 import datetime
 import json
 import shutil
+import pandas as pd
 
 # PyTorch Imports
 import torch
@@ -18,7 +19,7 @@ from utilities_imgmodels import MODELS_DICT as models_img_dict
 from utilities_preproc import sample_manager, QNS_structure
 from utilities_tabmodels import collaborative_tabular_normalize
 from utilities_tabmodels import MODELS_DICT as models_tab_dict
-from utilities_traintest import TripletDataset, train_model
+from utilities_traintest import TripletDataset, train_model, eval_model
 
 # WandB Imports
 import wandb
@@ -58,16 +59,11 @@ if __name__ == "__main__":
     parser.add_argument('--csvs_path', type=str, required=True, help="The path to the CSVs with metadata.")
     parser.add_argument('--pickles_path', type=str, required=True, help="The path to the pickle files (to speed up training).")
     parser.add_argument('--img_model_weights_path', type=str, required=True, help="The path to the weights of the image model.")
-    parser.add_argument('--results_path', type=str, required=True, help="The path to save the results.")
+    parser.add_argument('--results_path', type=str, required=False, help="The path to save the results.")
+    parser.add_argument('--train_or_test', type=str, required=False, choices=["train", "test"], default="train", help="The execution setting: train or test.")
+    parser.add_argument('--checkpoint_path', type=str, required=False, help="The path to the model checkpoints.")
     parser.add_argument('--verbose', action='store_true', default=False, help="Verbose.")
     args = parser.parse_args()
-
-
-    # Build a configuration dictionary for WandB
-    wandb_project_config = dict()
-    
-    # Create a timestamp for the experiment
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     # Get arguments
     gpu_id = args.gpu_id
@@ -76,6 +72,8 @@ if __name__ == "__main__":
     pickles_path = args.pickles_path
     img_model_weights_path = args.img_model_weights_path
     results_path = args.results_path
+    train_or_test = args.train_or_test
+    checkpoint_path = args.checkpoint_path
     verbose = args.verbose
 
     # Build paths
@@ -84,24 +82,37 @@ if __name__ == "__main__":
     patient_images_info = os.path.join(csvs_path, 'patient_images.csv')
     catalogue_info = os.path.join(csvs_path, 'catalogue_info.csv')
     catalogue_user_info = os.path.join(csvs_path, 'catalogue_user_info.csv')
-    experiment_results_path = os.path.join(results_path, timestamp)
-    path_save = os.path.join(experiment_results_path, 'bin')
+    
+    
+    if train_or_test == "train":
+        
+        # Create a timestamp for the experiment
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        experiment_results_path = os.path.join(results_path, timestamp)
+        path_save = os.path.join(experiment_results_path, 'bin')
 
+        # Build a configuration dictionary for WandB
+        wandb_project_config = dict()
 
-    # Create results path (if needed)
-    for path in [experiment_results_path, pickles_path, path_save]:
-        os.makedirs(path, exist_ok=True)
+        # Create results path (if needed)
+        for path in [experiment_results_path, pickles_path, path_save]:
+            os.makedirs(path, exist_ok=True)
 
+        # Open configuration JSON
+        with open(config_json_, 'r') as j:
+            config_json = json.load(j)
 
-    # Open configuration JSON
-    with open(config_json_, 'r') as j:
-        config_json = json.load(j)
+        # Copy configuration JSON to the experiment directory
+        _ = shutil.copyfile(
+            src=config_json_,
+            dst=os.path.join(experiment_results_path, 'config.json')
+        )
 
-    # Copy configuration JSON to the experiment directory
-    _ = shutil.copyfile(
-        src=config_json_,
-        dst=os.path.join(experiment_results_path, 'config.json')
-    )
+    else:
+        path_save = os.path.join(checkpoint_path, 'bin')
+        with open(os.path.join(checkpoint_path, 'config.json'), 'r') as j:
+            config_json = json.load(j)
+
 
     # Set seed(s)
     set_seed(seed=config_json["seed"])
@@ -113,25 +124,26 @@ if __name__ == "__main__":
 
 
 
-    # Add information to WandB
-    wandb_project_config["seed"] = config_json["seed"]
-    wandb_project_config["lr"] = config_json["lr"]
-    wandb_project_config["num_epochs"] = config_json["num_epochs"]
-    wandb_project_config[ "batch_size"] = config_json[ "batch_size"]
-    wandb_project_config["margin"] = config_json["margin"]
-    wandb_project_config["split_ratio"] = config_json["split_ratio"]
-    wandb_project_config["catalogue_type"] = config_json["catalogue_type"]
-    wandb_project_config["doctor_code"] = config_json["doctor_code"]
-    wandb_project_config["model_img_name"] = config_json["model_img_name"]
-    wandb_project_config["model_tab_name"] = config_json["model_tab_name"]
+    if train_or_test == "train":
+        # Add information to WandB
+        wandb_project_config["seed"] = config_json["seed"]
+        wandb_project_config["lr"] = config_json["lr"]
+        wandb_project_config["num_epochs"] = config_json["num_epochs"]
+        wandb_project_config[ "batch_size"] = config_json[ "batch_size"]
+        wandb_project_config["margin"] = config_json["margin"]
+        wandb_project_config["split_ratio"] = config_json["split_ratio"]
+        wandb_project_config["catalogue_type"] = config_json["catalogue_type"]
+        wandb_project_config["doctor_code"] = config_json["doctor_code"]
+        wandb_project_config["model_img_name"] = config_json["model_img_name"]
+        wandb_project_config["model_tab_name"] = config_json["model_tab_name"]
 
-    # Initialize WandB
-    wandb_run = wandb.init(
-        project="bcs-aesth-mm-attention-mir",
-        name=config_json["model_img_name"]+'_'+config_json["model_tab_name"]+'_'+timestamp,
-        config=wandb_project_config
-    )
-    assert wandb_run is wandb.run
+        # Initialize WandB
+        wandb_run = wandb.init(
+            project="bcs-aesth-mm-attention-mir",
+            name=config_json["model_img_name"]+'_'+config_json["model_tab_name"]+'_'+timestamp,
+            config=wandb_project_config
+        )
+        assert wandb_run is wandb.run
 
 
 
@@ -299,26 +311,52 @@ if __name__ == "__main__":
     criterion = TripletMarginLoss(margin=config_json["margin"], p=2)
     optimizer = optim.Adam(model_tab.parameters(), lr=config_json["lr"])
 
-    if verbose:
-        print(
-             'Training Multi-modal with ', 
-             config_json["model_img_name"], 
-             ' (image) and ', 
-             config_json["model_tab_name"], 
-             ' (tabular).'
-        )
+    if train_or_test == "train":
+        if verbose:
+            print(
+                'Training Multi-modal with ', 
+                config_json["model_img_name"], 
+                ' (image) and ', 
+                config_json["model_tab_name"], 
+                ' (tabular).'
+            )
 
-    train_model(
-         model=model_tab,
-         train_loader=train_loader, 
-         test_loader=test_loader, 
-         QNS_list_train=QNS_list_train_tab, 
-         QNS_list_test=QNS_list_test_tab, 
-         optimizer=optimizer, 
-         criterion=criterion, 
-         num_epochs=config_json["num_epochs"], 
-         device=device, 
-         path_save=path_save,
-         wandb_run=wandb_run  
-    )
-    wandb_run.finish()
+        train_model(
+            model=model_tab,
+            train_loader=train_loader, 
+            test_loader=test_loader, 
+            QNS_list_train=QNS_list_train_tab, 
+            QNS_list_test=QNS_list_test_tab, 
+            optimizer=optimizer, 
+            criterion=criterion, 
+            num_epochs=config_json["num_epochs"], 
+            device=device, 
+            path_save=path_save,
+            wandb_run=wandb_run  
+        )
+        wandb_run.finish()
+    
+    else:
+        model_tab.load_state_dict(torch.load(os.path.join(path_save, "model_final.pt"), map_location=device))
+        train_acc, train_ndcg = eval_model(
+            model=model_tab,
+            eval_loader=train_loader,
+            QNS_list_eval=QNS_list_image_train,
+            device=device
+        )
+        test_acc, test_ndcg = eval_model(
+            model=model_tab,
+            eval_loader=test_loader,
+            QNS_list_eval=QNS_list_image_test,
+            device=device
+        )
+        results_dict = {
+             "train_acc":[train_acc], 
+             "train_ndcg":[train_ndcg],
+            "test_acc":[test_acc],
+            "test_ndcg":[test_ndcg]
+        }
+        eval_df = pd.DataFrame.from_dict(results_dict)
+        if verbose:
+            print(eval_df)
+        eval_df.to_csv(os.path.join(checkpoint_path, "eval_results.csv"))
